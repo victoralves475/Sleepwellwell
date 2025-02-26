@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "845138137603",
+    "project_id": "b2z-marketplace",
+    "storage_bucket": "b2z-marketplace.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:845138137603:android:bc1f1591b95facfb3eb436",
+        "android_client_info": {
+          "package_name": "br.edu.ifpb.sleepwell"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCpqvgXiwsUmm3ZI1cnn6xvG4iw__uNxVc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:845138137603:android:091aa7d301fc37503eb436",
+        "android_client_info": {
+          "package_name": "com.example.navegacao1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCpqvgXiwsUmm3ZI1cnn6xvG4iw__uNxVc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
