@@ -8,7 +8,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -31,14 +30,14 @@ fun LoginScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    // Fundo preto para todo o layout
+    // Fundo geral usando MaterialTheme.colorScheme.background
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black),
+            .background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center
     ) {
-        // Coluna centralizada com espaçamento adequado
+        // Coluna principal, centralizada
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -46,32 +45,32 @@ fun LoginScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Título em branco
+            // Título em destaque
             Text(
                 text = "Bem-vindo ao SleepWell",
-                style = TextStyle(
+                style = MaterialTheme.typography.headlineLarge.copy(
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold
                 ),
-                color = Color.White
+                color = MaterialTheme.colorScheme.onBackground
             )
             Spacer(modifier = Modifier.height(4.dp))
-            // Subtítulo com tom de cinza claro
+            // Subtítulo com tom mais claro
             Text(
                 text = "Entre com seu email e senha",
                 style = MaterialTheme.typography.bodyMedium,
-                color = Color.LightGray
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
             )
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Card para o formulário com fundo cinza escuro
+            // Card do formulário
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp),
                 shape = MaterialTheme.shapes.medium,
                 elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.DarkGray)
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
             ) {
                 Column(
                     modifier = Modifier
@@ -79,34 +78,38 @@ fun LoginScreen(
                         .fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    OutlinedTextField(
+                    TextField(
                         value = email,
                         onValueChange = { email = it },
-                        label = { Text("Email", color = Color.White) },
+                        label = {
+                            Text("Email", color = MaterialTheme.colorScheme.onSurface)
+                        },
                         modifier = Modifier.fillMaxWidth(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                        textStyle = TextStyle(color = Color.White),
+                        textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
                         colors = TextFieldDefaults.outlinedTextFieldColors(
-                            containerColor = Color.DarkGray,
-                            focusedBorderColor = Color.White,
-                            unfocusedBorderColor = Color.LightGray,
-                            cursorColor = Color.White
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                            cursorColor = MaterialTheme.colorScheme.onSurface
                         )
                     )
                     Spacer(modifier = Modifier.height(12.dp))
-                    OutlinedTextField(
+                    TextField(
                         value = senha,
                         onValueChange = { senha = it },
-                        label = { Text("Senha", color = Color.White) },
+                        label = {
+                            Text("Senha", color = MaterialTheme.colorScheme.onSurface)
+                        },
                         modifier = Modifier.fillMaxWidth(),
                         visualTransformation = PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                        textStyle = TextStyle(color = Color.White),
+                        textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
                         colors = TextFieldDefaults.outlinedTextFieldColors(
-                            containerColor = Color.DarkGray,
-                            focusedBorderColor = Color.White,
-                            unfocusedBorderColor = Color.LightGray,
-                            cursorColor = Color.White
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                            cursorColor = MaterialTheme.colorScheme.onSurface
                         )
                     )
                     Spacer(modifier = Modifier.height(16.dp))
@@ -123,18 +126,18 @@ fun LoginScreen(
                             }
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                     ) {
-                        Text("Entrar", color = Color.Black)
+                        Text("Entrar", color = MaterialTheme.colorScheme.onPrimary)
                     }
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
-            // Link de cadastro em branco
+            // Link para cadastro
             TextButton(onClick = onNavigateToSignUp) {
                 Text(
                     text = "Ainda não tem conta? Cadastre-se",
-                    color = Color.White
+                    color = MaterialTheme.colorScheme.onBackground
                 )
             }
         }

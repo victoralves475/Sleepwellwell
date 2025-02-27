@@ -1,72 +1,129 @@
 package br.edu.ifpb.sleepwell.view.screens
 
-import androidx.compose.foundation.background
+//import android.graphics.Color
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AccountBox
+import androidx.compose.material.icons.filled.Create
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 
+
 /**
- * Representa uma funcionalidade do app, exibida como card na grade
+ * Representa uma funcionalidade do app, exibida como card na grade.
  */
 data class FeatureItem(
     val title: String,
     val description: String,
-    val count: Int = 0 // Por exemplo, "5 entradas", "2 novos", etc.
+    val icon: ImageVector,     // Ícone específico
+    val iconBgColor: Color,    // Cor de fundo do ícone
+    val count: Int = 0
 )
 
+
 /**
- * HomeScreen - Exemplo de layout baseado no mockup, que agora exibe "Olá, [nome do usuário]".
+ * HomeScreen - Exemplo de layout baseado no mockup, agora com um BottomAppBar
+ * e um FAB central.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    userName: String, // O nome do usuário logado (sem valor default, pois deve ser fornecido)
+    userName: String,
     efficiency: Float = 0.76f,
-    onTabSelected: (String) -> Unit = {},  // "Visão Geral" ou "Histórico de Sono"
+    onTabSelected: (String) -> Unit = {},   // "Visão Geral" ou "Histórico de Sono"
     onFeatureClick: (FeatureItem) -> Unit = {},
-    onFabClick: () -> Unit = {},
-    onLogout: () -> Unit = {}
+    onHomeClick: () -> Unit = {},           // Ação para ir/voltar à tela Home
+    onProfileClick: () -> Unit = {},        // Ação para editar perfil
+    onLogout: () -> Unit = {},              // Ação para sair
+    onFabClick: () -> Unit = {}             // Ação do FAB (botão azul central)
 ) {
     // Exemplo de lista de funcionalidades
     val features = listOf(
-        FeatureItem("Diário", "5 Entradas"),
-        FeatureItem("Lembretes", "2 Novos"),
-        FeatureItem("Monitoramento de Ciclos", "3 Novos"),
-        FeatureItem("Despertadores", "")
+        FeatureItem(
+            title = "Diário dos Sonhos",
+            description = "Nunca esqueça",
+            icon = Icons.Default.AccountBox,
+            iconBgColor = Color(0xFFE0E0E0) // Cinza claro, por exemplo
+        ),
+        FeatureItem(
+            title = "Dicas",
+            description = "Durma com os anjos",
+            icon = Icons.Default.DateRange,
+            iconBgColor = Color(0xFF76FF03) // Verde claro
+        ),
+        FeatureItem(
+            title = "Monitoramento de Ciclos",
+            description = "Durateston",
+            icon = Icons.Default.Star,
+            iconBgColor = Color(0xFFFFEB3B) // Amarelo claro
+        ),
+        FeatureItem(
+            title = "Despertadores",
+            description = "Na hora certa",
+            icon = Icons.Default.Notifications,
+            iconBgColor = Color(0xFF00E5FF) // Ciano claro
+        )
     )
 
+    // Captura somente o primeiro nome, com a inicial maiúscula
+    val firstName = userName
+        .split(" ")
+        .firstOrNull()
+        ?.lowercase()
+        ?.replaceFirstChar { it.uppercase() } ?: ""
+
     Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text("Início", style = MaterialTheme.typography.titleLarge) },
-                actions = {
-                    IconButton(onClick = { /* Ação de abrir perfil */ }) {
-                        Icon(Icons.Default.Person, contentDescription = "Perfil")
-                    }
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
-                )
-            )
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = onFabClick,
-                containerColor = MaterialTheme.colorScheme.primary
+        bottomBar = {
+            BottomAppBar(
+                modifier = Modifier.fillMaxWidth(),
+                containerColor = MaterialTheme.colorScheme.background,
+                contentColor = MaterialTheme.colorScheme.onSurface
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Adicionar")
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Ícone Home
+                    IconButton(onClick = onHomeClick) {
+                        Icon(Icons.Default.Home, contentDescription = "Home")
+                    }
+                    // Ícone Perfil dentro de um quadrado estilizado
+                    IconButton(onClick = onProfileClick, modifier = Modifier.size(56.dp)) {
+                        Surface(
+                            modifier = Modifier.fillMaxSize(),
+                            shape = MaterialTheme.shapes.medium, // Pode usar RoundedCornerShape(8.dp)
+                            color = MaterialTheme.colorScheme.primary
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Person,
+                                contentDescription = "Perfil",
+                                tint = MaterialTheme.colorScheme.onPrimary,
+                                modifier = Modifier.padding(12.dp)
+                            )
+                        }
+                    }
+                    // Ícone Logout
+                    IconButton(onClick = onLogout) {
+                        Icon(Icons.Default.ExitToApp, contentDescription = "Sair")
+                    }
+                }
             }
         },
-        containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -76,8 +133,13 @@ fun HomeScreen(
         ) {
             // Saudação com o nome do usuário logado
             Text(
-                text = "Olá, $userName",
-                style = MaterialTheme.typography.headlineMedium,
+                text = "Olá, ",
+                style = MaterialTheme.typography.headlineLarge,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            Text(
+                text = firstName,
+                style = MaterialTheme.typography.headlineLarge,
                 color = MaterialTheme.colorScheme.onBackground
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -103,11 +165,10 @@ fun HomeScreen(
             }
 
             Spacer(modifier = Modifier.height(16.dp))
-
             // Card para "Eficiência de Sono"
             SleepEfficiencyCard(efficiency)
-
             Spacer(modifier = Modifier.height(16.dp))
+
             Text(
                 text = "Funcionalidades",
                 style = MaterialTheme.typography.titleMedium,
@@ -118,7 +179,6 @@ fun HomeScreen(
             // Grid com as funcionalidades
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
-                modifier = Modifier.fillMaxHeight(0.5f),
                 contentPadding = PaddingValues(4.dp)
             ) {
                 items(features) { feature ->
@@ -126,17 +186,6 @@ fun HomeScreen(
                         onFeatureClick(feature)
                     }
                 }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(
-                onClick = onLogout,
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.secondary
-                )
-            ) {
-                Text("Sair", color = MaterialTheme.colorScheme.onSecondary)
             }
         }
     }
@@ -188,25 +237,54 @@ fun FeatureCard(featureItem: FeatureItem, onClick: () -> Unit) {
         modifier = Modifier
             .padding(8.dp)
             .fillMaxWidth()
-            .height(100.dp),
+            .defaultMinSize(minHeight = 172.dp),
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         onClick = onClick
     ) {
+        // Uma coluna que preenche o card, com os itens espaçados entre si
         Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(18.dp),
+            verticalArrangement = Arrangement.SpaceEvenly
         ) {
-            Text(
-                text = featureItem.title,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            Text(
-                text = featureItem.description,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-            )
+            // Bloco do ícone (ficará na parte superior)
+            Surface(
+                modifier = Modifier.size(40.dp),
+                shape = MaterialTheme.shapes.small, // ou use CircleShape para um círculo perfeito
+                color = featureItem.iconBgColor
+            ) {
+                Icon(
+                    imageVector = featureItem.icon,
+                    contentDescription = featureItem.title,
+                    tint = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(4.dp)
+                )
+            }
+            // Bloco de textos (ficará na parte inferior)
+            Column(
+                modifier = Modifier.fillMaxSize().padding(top = 24.dp),
+                //horizontalAlignment = Alignment.End,
+                verticalArrangement = Arrangement.Bottom
+            ) {
+                Text(
+                    text = featureItem.title,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                Text(
+                    text = featureItem.description,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                )
+            }
         }
     }
 }
+
+
+
+
+
