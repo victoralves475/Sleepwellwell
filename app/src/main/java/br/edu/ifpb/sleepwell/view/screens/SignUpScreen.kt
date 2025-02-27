@@ -8,7 +8,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -32,10 +31,11 @@ fun SignUpScreen(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
+    // Fundo usando cor do tema
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black),
+            .background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -45,30 +45,31 @@ fun SignUpScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Título e subtítulo
+            // Título
             Text(
                 text = "Cadastro",
-                style = TextStyle(
+                style = MaterialTheme.typography.headlineLarge.copy(
                     fontSize = 28.sp,
                     fontWeight = FontWeight.Bold
                 ),
-                color = Color.White
+                color = MaterialTheme.colorScheme.onBackground
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = "Preencha os campos para criar sua conta",
                 style = MaterialTheme.typography.bodyMedium,
-                color = Color.LightGray
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
             )
             Spacer(modifier = Modifier.height(24.dp))
-            // Card contendo os campos
+
+            // Card com campos
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp),
                 shape = MaterialTheme.shapes.medium,
                 elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.DarkGray)
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
             ) {
                 Column(
                     modifier = Modifier
@@ -76,48 +77,54 @@ fun SignUpScreen(
                         .fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    OutlinedTextField(
+                    TextField(
                         value = nome,
                         onValueChange = { nome = it },
-                        label = { Text("Nome", color = Color.White) },
+                        label = {
+                            Text("Nome", color = MaterialTheme.colorScheme.onSurface)
+                        },
                         modifier = Modifier.fillMaxWidth(),
-                        textStyle = TextStyle(color = Color.White),
+                        textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
                         colors = TextFieldDefaults.outlinedTextFieldColors(
-                            containerColor = Color.DarkGray,
-                            focusedBorderColor = Color.White,
-                            unfocusedBorderColor = Color.LightGray,
-                            cursorColor = Color.White
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                            cursorColor = MaterialTheme.colorScheme.onSurface
                         )
                     )
                     Spacer(modifier = Modifier.height(12.dp))
-                    OutlinedTextField(
+                    TextField(
                         value = email,
                         onValueChange = { email = it },
-                        label = { Text("Email", color = Color.White) },
+                        label = {
+                            Text("Email", color = MaterialTheme.colorScheme.onSurface)
+                        },
                         modifier = Modifier.fillMaxWidth(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                        textStyle = TextStyle(color = Color.White),
+                        textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
                         colors = TextFieldDefaults.outlinedTextFieldColors(
-                            containerColor = Color.DarkGray,
-                            focusedBorderColor = Color.White,
-                            unfocusedBorderColor = Color.LightGray,
-                            cursorColor = Color.White
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                            cursorColor = MaterialTheme.colorScheme.onSurface
                         )
                     )
                     Spacer(modifier = Modifier.height(12.dp))
-                    OutlinedTextField(
+                    TextField(
                         value = senha,
                         onValueChange = { senha = it },
-                        label = { Text("Senha", color = Color.White) },
+                        label = {
+                            Text("Senha", color = MaterialTheme.colorScheme.onSurface)
+                        },
                         modifier = Modifier.fillMaxWidth(),
                         visualTransformation = PasswordVisualTransformation(),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                        textStyle = TextStyle(color = Color.White),
+                        textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
                         colors = TextFieldDefaults.outlinedTextFieldColors(
-                            containerColor = Color.DarkGray,
-                            focusedBorderColor = Color.White,
-                            unfocusedBorderColor = Color.LightGray,
-                            cursorColor = Color.White
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                            cursorColor = MaterialTheme.colorScheme.onSurface
                         )
                     )
                     Spacer(modifier = Modifier.height(16.dp))
@@ -135,16 +142,16 @@ fun SignUpScreen(
                             }
                         },
                         modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.White)
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                     ) {
-                        Text("Cadastrar", color = Color.Black)
+                        Text("Cadastrar", color = MaterialTheme.colorScheme.onPrimary)
                     }
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
             // Link para voltar à tela de login
             TextButton(onClick = onNavigateToLogin) {
-                Text("Já tem conta? Faça login", color = Color.White)
+                Text("Já tem conta? Faça login", color = MaterialTheme.colorScheme.onBackground)
             }
         }
     }

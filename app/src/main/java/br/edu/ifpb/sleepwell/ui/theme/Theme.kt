@@ -1,35 +1,30 @@
 package br.edu.ifpb.sleepwell.ui.theme
 
-import android.os.Build
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 
-// Definição das cores para o dark theme
+// Esquema de cores escuras baseado na imagem do mockup
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
+    primary = Color(0xFF3A6FF7),    // Azul para destaques (FAB, botão "Visão Geral", barra de progresso)
     onPrimary = Color.White,
-    secondary = PurpleGrey80,
+
+    secondary = Color(0xFF626262), // Cinza médio para destaques secundários
     onSecondary = Color.White,
-    tertiary = Pink80,
-    background = Color(0xFF121212),  // Fundo bem escuro
-    onBackground = Color(0xFFECECEC),
-    surface = Color(0xFF1E1E1E),
-    onSurface = Color(0xFFF0F0F0)
+
+    background = Color.Black,      // Fundo preto
+    onBackground = Color.White,
+
+    surface = Color(0xFF2C2C2C),   // Cartões e containers
+    onSurface = Color.White
+    // Se quiser, defina tertiary, error etc. conforme necessidade
 )
 
 @Composable
 fun SleepwellTheme(content: @Composable () -> Unit) {
-    // Se o dispositivo é Android 12+ (S), utiliza as cores dinâmicas escuras; senão, usa o DarkColorScheme fixo.
-    val colorScheme = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        dynamicDarkColorScheme(LocalContext.current)
-    } else {
-        DarkColorScheme
-    }
-
+    // Removemos a lógica de cores dinâmicas para usar SEMPRE esse esquema
     MaterialTheme(
-        colorScheme = colorScheme,
+        colorScheme = DarkColorScheme,
         typography = Typography,
         content = content
     )
