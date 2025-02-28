@@ -11,9 +11,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import br.edu.ifpb.sleepwell.view.screens.AlarmScreen
 import br.edu.ifpb.sleepwell.model.SessionManager
@@ -42,16 +44,24 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun SleepWellApp(context: Context) {
     val navController = rememberNavController()
+    val backStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = backStackEntry?.destination?.route
 
-    Scaffold(modifier = Modifier.fillMaxSize(), bottomBar = {
-        BottomAppBar(
-            onProfileClick = { navController.navigate("profile") },
-            onHomeClick = { navController.navigate("home") },
-            onLogout = {
-                SessionManager.currentUser = null
-                navController.navigate("login")
-            })
-    }) { innerPadding ->
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        bottomBar = {
+            if (currentRoute !in listOf("login", "signup")) {
+                BottomAppBar(
+                    onProfileClick = { navController.navigate("profile") },
+                    onHomeClick = { navController.navigate("home") },
+                    onLogout = {
+                        SessionManager.currentUser = null
+                        navController.navigate("login")
+                    }
+                )
+            }
+        }
+    ) { innerPadding ->
         NavHost(
             navController = navController,
             startDestination = "splash",
