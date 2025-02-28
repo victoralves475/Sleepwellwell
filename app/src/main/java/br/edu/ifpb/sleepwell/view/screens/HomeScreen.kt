@@ -31,7 +31,8 @@ data class FeatureItem(
     val description: String,
     val icon: ImageVector,     // Ícone específico
     val iconBgColor: Color,    // Cor de fundo do ícone
-    val count: Int = 0
+    val count: Int = 0,
+    val onClick: () -> Unit = {}
 )
 
 
@@ -45,7 +46,9 @@ fun HomeScreen(
     userName: String,
     efficiency: Float = 0.76f,
     onTabSelected: (String) -> Unit = {},   // "Visão Geral" ou "Histórico de Sono"
-    onFeatureClick: (FeatureItem) -> Unit = {},
+    onNavigateToAlarm: () -> Unit = {},     // Ação para ir para a tela de alarme
+    onNavigateToDiary: () -> Unit = {},     // Ação para ir para a tela do diário
+    onNavigateToReminders: () -> Unit = {}, // Ação para ir para a tela dos lembretes
     onHomeClick: () -> Unit = {},           // Ação para ir/voltar à tela Home
     onProfileClick: () -> Unit = {},        // Ação para editar perfil
     onLogout: () -> Unit = {},              // Ação para sair
@@ -57,13 +60,15 @@ fun HomeScreen(
             title = "Diário dos Sonhos",
             description = "Nunca esqueça",
             icon = Icons.Default.AccountBox,
-            iconBgColor = Color(0xFFE0E0E0) // Cinza claro, por exemplo
+            iconBgColor = Color(0xFFE0E0E0), // Cinza claro, por exemplo
+            onClick = onNavigateToDiary
         ),
         FeatureItem(
             title = "Dicas",
             description = "Durma com os anjos",
             icon = Icons.Default.DateRange,
-            iconBgColor = Color(0xFF76FF03) // Verde claro
+            iconBgColor = Color(0xFF76FF03), // Verde claro
+            onClick = onNavigateToReminders
         ),
         FeatureItem(
             title = "Monitoramento de Ciclos",
@@ -75,7 +80,8 @@ fun HomeScreen(
             title = "Despertadores",
             description = "Na hora certa",
             icon = Icons.Default.Notifications,
-            iconBgColor = Color(0xFF00E5FF) // Ciano claro
+            iconBgColor = Color(0xFF00E5FF), // Ciano claro
+            onClick = onNavigateToAlarm
         )
     )
 
@@ -182,9 +188,7 @@ fun HomeScreen(
                 contentPadding = PaddingValues(4.dp)
             ) {
                 items(features) { feature ->
-                    FeatureCard(featureItem = feature) {
-                        onFeatureClick(feature)
-                    }
+                    FeatureCard(featureItem = feature, onClick = feature.onClick)
                 }
             }
         }

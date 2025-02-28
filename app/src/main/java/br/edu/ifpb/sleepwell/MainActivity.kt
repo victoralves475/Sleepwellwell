@@ -15,7 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import br.edu.ifpb.pdm.myapplication.AlarmScreen
+import br.edu.ifpb.sleepwell.view.screens.AlarmScreen
 import br.edu.ifpb.sleepwell.model.SessionManager
 import br.edu.ifpb.sleepwell.ui.theme.SleepwellTheme
 import br.edu.ifpb.sleepwell.view.screens.HomeScreen
@@ -24,6 +24,7 @@ import br.edu.ifpb.sleepwell.view.screens.SignUpScreen
 import br.edu.ifpb.sleepwell.view.screens.SplashScreen
 
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.S)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -74,6 +75,9 @@ fun SleepWellApp(context: Context) {
             composable("home") {
                 HomeScreen(
                     userName = SessionManager.currentUser?.nome ?: "Usuário",
+                    onNavigateToAlarm = { navController.navigate("alarm") },
+//                    onNavigateToDiary = { navController.navigate("diary") },
+//                    onNavigateToReminders = { navController.navigate("reminders") },
                     onLogout = {
                         // Opcional: limpar a sessão no logout
                         SessionManager.currentUser = null

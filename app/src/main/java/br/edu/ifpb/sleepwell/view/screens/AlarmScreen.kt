@@ -1,4 +1,4 @@
-package br.edu.ifpb.pdm.myapplication
+package br.edu.ifpb.sleepwell.view.screens
 
 import android.app.AlarmManager
 import android.app.PendingIntent
@@ -6,10 +6,7 @@ import android.app.TimePickerDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.os.Bundle
 import android.widget.Toast
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
