@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -69,8 +70,8 @@ fun HomeScreen(
         FeatureItem(
             title = "Monitoramento de Ciclos",
             description = "Durateston",
-            icon = Icons.Default.Star,
-            iconBgColor = Color(0xFFFFEB3B) // Amarelo claro
+            icon = Icons.Default.DateRange,
+            iconBgColor = Color(0xFF76FF03) // Amarelo claro
         ),
         FeatureItem(
             title = "Despertadores",
@@ -245,8 +246,3 @@ fun FeatureCard(featureItem: FeatureItem, onClick: () -> Unit) {
         }
     }
 }
-
-
-
-
-
