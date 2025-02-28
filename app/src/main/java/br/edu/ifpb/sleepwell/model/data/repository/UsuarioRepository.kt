@@ -54,7 +54,6 @@ class UsuarioRepository {
             .addOnSuccessListener { callback(true) }
             .addOnFailureListener { callback(false) }
     }
-
     /**
      * Adiciona um novo Diário de Sonho na subcoleção do usuário.
      *
@@ -69,17 +68,21 @@ class UsuarioRepository {
         onSuccess: () -> Unit,
         onFailure: (Exception) -> Unit
     ) {
+        // Gera um ID único para o novo documento
         val diarioId = db.collection("usuarios")
             .document(usuarioId)
             .collection("diarios")
             .document().id
 
-        // Salvando o diário sem adicionar o ID ao objeto
+        // Cria um novo DiarioDeSonho com o ID atribuído
+        val novoDiario = diarioDeSonho.copy(id = diarioId)
+
+        // Salva o diário usando o ID gerado
         db.collection("usuarios")
             .document(usuarioId)
             .collection("diarios")
             .document(diarioId)
-            .set(diarioDeSonho)
+            .set(novoDiario)
             .addOnSuccessListener {
                 onSuccess()
             }
