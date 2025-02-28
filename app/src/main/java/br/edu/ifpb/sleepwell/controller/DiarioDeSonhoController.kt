@@ -57,8 +57,33 @@ class DiarioDeSonhoController(private val repository: UsuarioRepository = Usuari
     ) {
         val usuarioId = SessionManager.currentUser?.id ?: return
 
-        repository.listarDiariosDeSonho(usuarioId) { diarios ->
-            onSuccess(diarios)
-        }
+        // Chama o repository para buscar os diários do usuário
+        repository.listarDiariosDeSonho(
+            usuarioId,
+            callback = {diarios -> onSuccess(diarios)}
+        );
+    }
+
+    /**
+     * Exclui um Diário de Sonho para o usuário autenticado.
+     *
+     * @param diarioId ID do Diário de Sonho a ser excluído.
+     * @param onSuccess Callback em caso de sucesso.
+     * @param onFailure Callback em caso de falha.
+     */
+    fun excluirDiarioDeSonho(
+        diarioId: String,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        val usuarioId = SessionManager.currentUser?.id ?: return
+
+        // Chama o repository para excluir o diário do usuário
+        repository.removerDiarioDeSonho(
+            usuarioId,
+            diarioId,
+            onSuccess,
+            onFailure
+        )
     }
 }
