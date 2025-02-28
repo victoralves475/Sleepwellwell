@@ -22,6 +22,7 @@ import br.edu.ifpb.sleepwell.model.SessionManager
 import br.edu.ifpb.sleepwell.ui.theme.SleepwellTheme
 import br.edu.ifpb.sleepwell.view.screens.AddDreamScreen
 import br.edu.ifpb.sleepwell.view.screens.BottomAppBar
+import br.edu.ifpb.sleepwell.view.screens.DreamDiaryScreen
 import br.edu.ifpb.sleepwell.view.screens.HomeScreen
 import br.edu.ifpb.sleepwell.view.screens.TipsScreen
 import br.edu.ifpb.sleepwell.view.screens.LoginScreen
@@ -97,7 +98,7 @@ fun SleepWellApp(context: Context) {
                 HomeScreen(
                     userName = SessionManager.currentUser?.nome ?: "Usuário",
                     onAlarmClick = { navController.navigate("alarm") },
-                    onNavigateToDiary = { navController.navigate("add-dream") },
+                    onNavigateToDiary = { navController.navigate("dream-diary") },
                     onTipsClick = { navController.navigate("tips") },
                 )
             }
@@ -109,9 +110,17 @@ fun SleepWellApp(context: Context) {
             composable("tips") {
                 TipsScreen()
             }
+            // Tela do diario de sonhos
+            composable("dream-diary") {
+                DreamDiaryScreen (onAddDreamClick = {navController.navigate("add-dream")})
+            }
+
             // Tela adicionar sonho
             composable("add-dream") {
-                AddDreamScreen ( onSaveSuccess = {navController.navigate("home")})
+                AddDreamScreen (
+                    onSaveSuccess = {navController.navigate("dream-diary")},
+                    onCancelClick = {navController.navigate("dream-diary")}
+                )
             }
         }
     }
