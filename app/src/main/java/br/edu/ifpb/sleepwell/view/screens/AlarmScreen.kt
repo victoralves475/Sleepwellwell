@@ -8,17 +8,24 @@ import android.content.Intent
 import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import br.edu.ifpb.sleepwell.alarm.AlarmReceiver
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlinx.coroutines.launch
 
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
@@ -27,82 +34,143 @@ fun AlarmScreen(context: Context) {
     var alarmTime by remember { mutableStateOf(0L) }
     val cycleDuration = 90 * 60 * 1000L // 90 minutos em milissegundos
     var suggestedTimes by remember { mutableStateOf<List<Long>>(emptyList()) }
-    var selectedSuggestedTime by remember { mutableStateOf<Long?>(null) } // Para armazenar o horário sugerido selecionado
+    var selectedSuggestedTime by remember { mutableStateOf<Long?>(null) }
 
-    Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+    // Layout principal com fundo do tema
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .padding(16.dp)
     ) {
-        // Botões de Set Alarm e Test Alarm
-        Button(onClick = {
-            showTimePicker(context) { hour, minute ->
-                val calendar = Calendar.getInstance().apply {
-                    set(Calendar.HOUR_OF_DAY, hour)
-                    set(Calendar.MINUTE, minute)
-                    set(Calendar.SECOND, 0)
-                }
-                suggestedTimes = calculateSleepCycles(calendar.timeInMillis, cycleDuration)
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.Start
+        ) {
+            // Título da tela
+            Text(
+                text = "Ajuste seu",
+                style = MaterialTheme.typography.headlineMedium.copy(fontSize = 20.sp),
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Despertador",
+                style = MaterialTheme.typography.headlineLarge.copy(fontSize = 50.sp),
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Botão para selecionar horário via TimePicker
+            Button(
+                onClick = {
+                    showTimePicker(context) { hour, minute ->
+                        val calendar = Calendar.getInstance().apply {
+                            set(Calendar.HOUR_OF_DAY, hour)
+                            set(Calendar.MINUTE, minute)
+                            set(Calendar.SECOND, 0)
+                        }
+                        suggestedTimes = calculateSleepCycles(calendar.timeInMillis, cycleDuration)
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary), shape = RoundedCornerShape(8.dp)
+            ) {
+                Text("Definir", color = MaterialTheme.colorScheme.onPrimary, fontSize = 20.sp)
             }
-        }) {
-            Text("Set Alarm")
-        }
+            Spacer(modifier = Modifier.height(16.dp))
 
-        Spacer(modifier = Modifier.height(16.dp))
+            // Botão para teste do alarme (+5s)
+            Button(
+                onClick = {
+                    val now = Calendar.getInstance().apply { add(Calendar.SECOND, 5) }
+                    alarmTime = now.timeInMillis
+                    selectedTime = SimpleDateFormat("hh:mm:ss a dd MMM yyyy", Locale.getDefault()).format(now.time)
+                    setAlarm(context, alarmTime, "Start")
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary), shape = RoundedCornerShape(8.dp)
+            ) {
+                Text("Testar (+5s)", color = MaterialTheme.colorScheme.onPrimary, fontSize = 20.sp)
+            }
+            Spacer(modifier = Modifier.height(16.dp))
 
-        Button(onClick = {
-            val now = Calendar.getInstance()
-            now.add(Calendar.SECOND, 5) // Adiciona 5 segundos ao tempo atual
-            alarmTime = now.timeInMillis
-            selectedTime = SimpleDateFormat("hh:mm:ss a dd MMM yyyy").format(now.time)
-            setAlarm(context, alarmTime, "Start")
-        }) {
-            Text("Test Alarm (+5s)")
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Exibir os horários sugeridos após a seleção
-        if (suggestedTimes.isNotEmpty() && selectedSuggestedTime == null) {
-            LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                items(suggestedTimes) { time ->
-                    val formattedTime = SimpleDateFormat("hh:mm a", Locale.getDefault()).format(Date(time))
-                    Button(
-                        onClick = {
-                            selectedSuggestedTime = time // Salva o horário selecionado
-                            selectedTime = formattedTime // Formata o horário selecionado
-                            setAlarm(context, time, "Start")
-                        },
-                        modifier = Modifier.fillMaxWidth().padding(8.dp)
-                    ) {
-                        Text("Suggested: $formattedTime")
+            // Lista de horários sugeridos, exibida em uma LazyColumn dentro de um Card
+            if (suggestedTimes.isNotEmpty() && selectedSuggestedTime == null) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                ) {
+                    LazyColumn(modifier = Modifier.padding(8.dp)) {
+                        items(suggestedTimes) { time ->
+                            val formattedTime = SimpleDateFormat("hh:mm a", Locale.getDefault()).format(Date(time))
+                            OutlinedButton(
+                                onClick = {
+                                    selectedSuggestedTime = time
+                                    selectedTime = formattedTime
+                                    setAlarm(context, time, "Start")
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp),
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    contentColor = MaterialTheme.colorScheme.primary
+                                )
+                            ) {
+                                Text("Suggested: $formattedTime")
+                            }
+                        }
                     }
                 }
             }
-        }
+            Spacer(modifier = Modifier.height(16.dp))
 
-        Spacer(modifier = Modifier.height(16.dp))
+            // Linha com botões para Cancel e Stop Alarm
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Button(
+                    onClick = { cancelAlarm(context) },
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(40.dp),
+                    colors = ButtonDefaults
+                        .buttonColors(containerColor = MaterialTheme.colorScheme.secondary), shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text("Cancelar", color = MaterialTheme.colorScheme.onSecondary, fontSize = 16.sp)
+                }
+                Spacer(modifier = Modifier.width(16.dp))
+                Button(
+                    onClick = { stopAlarm(context) },
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(40.dp),
+                    colors = ButtonDefaults
+                        .buttonColors(containerColor = MaterialTheme.colorScheme.secondary), shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text("Parar", color = MaterialTheme.colorScheme.onSecondary, fontSize = 16.sp)
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
 
-        // Botões de Cancel Alarm e Stop Alarm (sempre visíveis)
-        Button(onClick = { cancelAlarm(context) }) {
-            Text("Cancel Alarm")
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Button(onClick = { stopAlarm(context) }) {
-            Text("Stop Alarm")
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Mostrar o tempo do alarme após a seleção
-        if (selectedTime.isNotEmpty()) {
-            Text("Alarm Set For: $selectedTime")
+            // Exibe o tempo do alarme configurado
+            if (selectedTime.isNotEmpty()) {
+                Text(
+                    text = "Alarm Set For: $selectedTime",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+            }
         }
     }
 }
-
 
 @RequiresApi(Build.VERSION_CODES.S)
 fun showTimePicker(context: Context, onTimeSelected: (Int, Int) -> Unit) {
@@ -122,11 +190,10 @@ fun calculateSleepCycles(targetTime: Long, cycleSize: Long): List<Long> {
     var alarmTime = targetTime
 
     if (alarmTime < currentTime) {
-        alarmTime += + 24 * 60 * 60 * 1000L // Ajuste para o próximo dia
+        alarmTime += 24 * 60 * 60 * 1000L // Ajuste para o próximo dia
     }
 
     var time = currentTime
-
     while (time <= alarmTime) {
         time += cycleSize
         wakeUpTimes.add(time)
