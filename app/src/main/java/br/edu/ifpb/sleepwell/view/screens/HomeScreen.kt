@@ -7,7 +7,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Home
@@ -46,9 +45,9 @@ fun HomeScreen(
     userName: String,
     efficiency: Float = 0.76f,
     onTabSelected: (String) -> Unit = {},   // "Visão Geral" ou "Histórico de Sono"
-    onNavigateToAlarm: () -> Unit = {},     // Ação para ir para a tela de alarme
+    onAlarmClick: () -> Unit = {},     // Ação para ir para a tela de alarme
     onNavigateToDiary: () -> Unit = {},     // Ação para ir para a tela do diário
-    onNavigateToReminders: () -> Unit = {}, // Ação para ir para a tela dos lembretes
+    onTipsClick: () -> Unit = {}, // Ação para ir para a tela dos lembretes
     onHomeClick: () -> Unit = {},           // Ação para ir/voltar à tela Home
     onProfileClick: () -> Unit = {},        // Ação para editar perfil
     onLogout: () -> Unit = {},              // Ação para sair
@@ -68,7 +67,7 @@ fun HomeScreen(
             description = "Durma com os anjos",
             icon = Icons.Default.DateRange,
             iconBgColor = Color(0xFF76FF03), // Verde claro
-            onClick = onNavigateToReminders
+            onClick = onTipsClick
         ),
         FeatureItem(
             title = "Monitoramento de Ciclos",
@@ -81,7 +80,7 @@ fun HomeScreen(
             description = "Na hora certa",
             icon = Icons.Default.Notifications,
             iconBgColor = Color(0xFF00E5FF), // Ciano claro
-            onClick = onNavigateToAlarm
+            onClick = onAlarmClick
         )
     )
 

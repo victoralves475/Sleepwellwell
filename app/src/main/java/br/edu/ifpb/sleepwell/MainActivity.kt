@@ -19,6 +19,7 @@ import br.edu.ifpb.sleepwell.view.screens.AlarmScreen
 import br.edu.ifpb.sleepwell.model.SessionManager
 import br.edu.ifpb.sleepwell.ui.theme.SleepwellTheme
 import br.edu.ifpb.sleepwell.view.screens.HomeScreen
+import br.edu.ifpb.sleepwell.view.screens.TipsScreen
 import br.edu.ifpb.sleepwell.view.screens.LoginScreen
 import br.edu.ifpb.sleepwell.view.screens.SignUpScreen
 import br.edu.ifpb.sleepwell.view.screens.SplashScreen
@@ -75,9 +76,9 @@ fun SleepWellApp(context: Context) {
             composable("home") {
                 HomeScreen(
                     userName = SessionManager.currentUser?.nome ?: "Usuário",
-                    onNavigateToAlarm = { navController.navigate("alarm") },
+                    onAlarmClick = { navController.navigate("alarm") },
 //                    onNavigateToDiary = { navController.navigate("diary") },
-//                    onNavigateToReminders = { navController.navigate("reminders") },
+                    onTipsClick = { navController.navigate("tips") },
                     onLogout = {
                         // Opcional: limpar a sessão no logout
                         SessionManager.currentUser = null
@@ -88,6 +89,10 @@ fun SleepWellApp(context: Context) {
             // Tela de alarme
             composable("alarm") {
                 AlarmScreen(context = context)
+            }
+            // Tela de dicas
+            composable("tips") {
+                TipsScreen()
             }
         }
     }
