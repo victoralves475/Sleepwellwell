@@ -3,6 +3,7 @@ package br.edu.ifpb.sleepwell.view.screens
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -59,18 +60,26 @@ fun DreamDiaryScreen(
                 .fillMaxSize()
                 .padding(padding)
                 .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.Start
         ) {
             // Título da tela
             Text(
-                text = "Diário de Sonhos",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary,
-                textAlign = TextAlign.Center
+                text = "Diário dos",
+                style = MaterialTheme.typography.headlineSmall.copy(fontSize = 20.sp),
+                color = MaterialTheme.colorScheme.onBackground,
+                textAlign = TextAlign.Start
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = "Sonhos",
+                style = MaterialTheme.typography.headlineLarge.copy(fontSize = 50.sp),
+                color = MaterialTheme.colorScheme.onBackground,
+                textAlign = TextAlign.Start
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
 
             // Estado de Carregamento
             if (isLoading) {
@@ -186,10 +195,11 @@ fun DreamCard(
                 Button(
                     onClick = onDelete,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.error,
+                        containerColor = MaterialTheme.colorScheme.secondary,
                         contentColor = Color.White
                     ),
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.align(Alignment.End)
                 ) {
                     Text(text = "Excluir", fontWeight = FontWeight.Bold)
                 }

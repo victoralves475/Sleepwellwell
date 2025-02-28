@@ -1,193 +1,188 @@
 package br.edu.ifpb.sleepwell.view.screens
 
+import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.OffsetMapping
-import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import br.edu.ifpb.sleepwell.controller.DiarioDeSonhoController
-//import java.text.SimpleDateFormat
-//import java.util.Locale
+import br.edu.ifpb.sleepwell.utils.DataMaskVisualTransformation
+import kotlinx.coroutines.launch
 
-//@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddDreamScreen(
     onSaveSuccess: () -> Unit,  // Navega para outra tela após salvar, se necessário
     onCancelClick: () -> Unit
 ) {
-    // Instancia o Controller diretamente na tela
     val diarioController = DiarioDeSonhoController()
-
-    // Campos para título, relato e data
     var titulo by remember { mutableStateOf("") }
     var relato by remember { mutableStateOf("") }
     var data by remember { mutableStateOf("") }
-
-    // Estado para mensagens de feedback
     var mensagemSucesso by remember { mutableStateOf("") }
     var mensagemErro by remember { mutableStateOf("") }
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
-    Column(
+    // Fundo preto conforme o tema dark
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .background(MaterialTheme.colorScheme.background)
+            .padding(vertical = 60.dp, horizontal = 16.dp)
     ) {
-        // Título da Tela
-        Text(
-            text = "Novo Diário de Sonho",
-            style = TextStyle(
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.Top
+        ) {
+            // Título da Tela: dois textos para diferenciar "Registre seu" e "Sonho"
+            Text(
+                text = "Registre seu",
+                style = MaterialTheme.typography.headlineSmall.copy(fontSize = 20.sp),
+                color = MaterialTheme.colorScheme.onBackground
             )
-        )
-        Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Sonho",
+                style = MaterialTheme.typography.headlineLarge.copy(fontSize = 50.sp),
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            Spacer(modifier = Modifier.height(24.dp))
 
-        // Campo para Título do Sonho
-        OutlinedTextField(
-            value = titulo,
-            onValueChange = { titulo = it },
-            label = { Text("Título do Sonho") },
-            modifier = Modifier.fillMaxWidth()
-        )
+            // Card para agrupar os campos do formulário
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = MaterialTheme.shapes.medium,
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    OutlinedTextField(
+                        value = titulo,
+                        onValueChange = { titulo = it },
+                        label = { Text("Título do Sonho", color = MaterialTheme.colorScheme.onSurface) },
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                        textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                            cursorColor = MaterialTheme.colorScheme.onSurface
+                        )
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    OutlinedTextField(
+                        value = relato,
+                        onValueChange = { relato = it },
+                        label = { Text("Relato do Sonho", color = MaterialTheme.colorScheme.onSurface) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                        textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                            cursorColor = MaterialTheme.colorScheme.onSurface
+                        )
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    OutlinedTextField(
+                        value = data,
+                        onValueChange = { data = it },
+                        label = { Text("Data do Sonho (dd/MM/yyyy)", color = MaterialTheme.colorScheme.onSurface) },
+                        modifier = Modifier.fillMaxWidth(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
+                        colors = TextFieldDefaults.outlinedTextFieldColors(
+                            containerColor = MaterialTheme.colorScheme.surface,
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                            cursorColor = MaterialTheme.colorScheme.onSurface
+                        ),
+                        visualTransformation = DataMaskVisualTransformation()
+                    )
 
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Campo para Relato do Sonho
-        OutlinedTextField(
-            value = relato,
-            onValueChange = { relato = it },
-            label = { Text("Relato do Sonho") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Campo para Data do Sonho
-        OutlinedTextField(
-            value = data,
-            onValueChange = { data = it },
-            label = { Text("Data do Sonho (dd/MM/yyyy)") },
-            modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-//            visualTransformation = DataMaskVisualTransformation()
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-        // Botão de Salvar
-        Button(
-            onClick = {
-                // Chama o Controller diretamente para adicionar o Diário de Sonho
-                diarioController.adicionarDiarioDeSonho(
-                    titulo = titulo,
-                    relato = relato,
-                    data = data,
-                    onSuccess = {
-                        mensagemSucesso = "Diário salvo com sucesso!"
-                        mensagemErro = ""
-                        // Limpa os campos
-                        titulo = ""
-                        relato = ""
-                        data = ""
-
-                        // Se precisar navegar para outra tela após salvar
-                        onSaveSuccess()
-                    },
-                    onFailure = { e ->
-                        mensagemErro = "Erro ao salvar: ${e.message}"
-                        mensagemSucesso = ""
+                    Spacer(modifier = Modifier.height(32.dp))
+                    // Botão de Salvar
+                    Button(
+                        onClick = {
+                            scope.launch {
+                                diarioController.adicionarDiarioDeSonho(
+                                    titulo = titulo,
+                                    relato = relato,
+                                    data = data,
+                                    onSuccess = {
+                                        mensagemSucesso = "Diário salvo com sucesso!"
+                                        mensagemErro = ""
+                                        titulo = ""
+                                        relato = ""
+                                        data = ""
+                                        onSaveSuccess()
+                                    },
+                                    onFailure = { e ->
+                                        mensagemErro = "Erro ao salvar: ${e.message}"
+                                        mensagemSucesso = ""
+                                    }
+                                )
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        ),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Text("Salvar", fontWeight = FontWeight.Bold, fontSize = 18.sp)
                     }
-                )
-            },
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = Color.White
-            )
-        ) {
-            Text(text = "Salvar", fontWeight = FontWeight.Bold)
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Botão de Cancelar
-        Button(
-            onClick = onCancelClick,  // Recebe a função externa para navegar ou cancelar
-            modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.error,
-                contentColor = Color.White
-            )
-        ) {
-            Text(text = "Cancelar", fontWeight = FontWeight.Bold)
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Mensagem de Sucesso
-        if (mensagemSucesso.isNotEmpty()) {
-            Text(text = mensagemSucesso, color = Color.Green)
-        }
-
-        // Mensagem de Erro
-        if (mensagemErro.isNotEmpty()) {
-            Text(text = mensagemErro, color = MaterialTheme.colorScheme.error)
-        }
-    }
-}
-
-
-
-// TODO CONSEGUIR APLICAR MASK!!!
-// Classe interna para aplicar a máscara de data (dd/MM/yyyy)
-class DataMaskVisualTransformation : VisualTransformation {
-    override fun filter(text: AnnotatedString): TransformedText {
-        // Remove tudo que não for número
-        val digits = text.text.filter { it.isDigit() }
-
-        // Aplica a máscara
-        val formatted = StringBuilder()
-        for (i in digits.indices) {
-            if (i == 2 || i == 4) {
-                formatted.append('/')
+                }
             }
-            formatted.append(digits[i])
-        }
-
-        // Limita o tamanho a 10 caracteres (dd/MM/yyyy)
-        val masked = formatted.toString().take(10)
-
-        // Mapeamento correto do cursor
-        val offsetMapping = object : OffsetMapping {
-            override fun originalToTransformed(offset: Int): Int {
-                var transformed = offset
-                if (offset > 1) transformed += 1
-                if (offset > 3) transformed += 1
-                return transformed
+            Spacer(modifier = Modifier.height(16.dp))
+            // Botão de Cancelar
+            Button(
+                onClick = onCancelClick,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    contentColor = Color.White
+                ),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Text("Cancelar", fontWeight = FontWeight.Bold, fontSize = 18.sp)
             }
-
-            override fun transformedToOriginal(offset: Int): Int {
-                var original = offset
-                if (offset > 2) original -= 1
-                if (offset > 5) original -= 1
-                return original
+            Spacer(modifier = Modifier.height(16.dp))
+            // Mensagens de Feedback
+            if (mensagemSucesso.isNotEmpty()) {
+                Text(text = mensagemSucesso, color = Color.Green, fontSize = 16.sp)
+            }
+            if (mensagemErro.isNotEmpty()) {
+                Text(text = mensagemErro, color = MaterialTheme.colorScheme.error, fontSize = 16.sp)
             }
         }
-
-        return TransformedText(AnnotatedString(masked), offsetMapping)
     }
 }

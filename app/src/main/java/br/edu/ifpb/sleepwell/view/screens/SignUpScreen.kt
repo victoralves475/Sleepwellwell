@@ -1,5 +1,6 @@
 package br.edu.ifpb.sleepwell.view.screens
 
+import android.util.Patterns
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -11,6 +12,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -18,8 +20,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import br.edu.ifpb.sleepwell.R
 import br.edu.ifpb.sleepwell.controller.SignUpController
 import kotlinx.coroutines.launch
@@ -38,15 +38,13 @@ fun SignUpScreen(
     val scope = rememberCoroutineScope()
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // Imagem de fundo (onda azul), preenchendo toda a tela
+        // Imagem de fundo (onda azul) com overlay para contraste
         Image(
-            painter = painterResource(id = R.drawable.wave_background), // Ajuste para o nome correto do seu arquivo
+            painter = painterResource(id = R.drawable.wave_background),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
-
-        // Overlay preto translúcido para melhor contraste
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -59,7 +57,7 @@ fun SignUpScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Título
+                // Título da Tela
                 Text(
                     text = "Cadastro",
                     style = MaterialTheme.typography.headlineLarge.copy(
@@ -69,7 +67,6 @@ fun SignUpScreen(
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Spacer(modifier = Modifier.height(4.dp))
-
                 // Subtítulo
                 Text(
                     text = "Preencha os campos para criar sua conta",
@@ -78,7 +75,7 @@ fun SignUpScreen(
                 )
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Card com campos
+                // Card com os campos do formulário
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -99,6 +96,7 @@ fun SignUpScreen(
                             onValueChange = { nome = it },
                             label = { Text("Nome", color = MaterialTheme.colorScheme.onSurface) },
                             modifier = Modifier.fillMaxWidth(),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                             textStyle = TextStyle(color = MaterialTheme.colorScheme.onSurface),
                             colors = TextFieldDefaults.outlinedTextFieldColors(
                                 containerColor = MaterialTheme.colorScheme.surface,
@@ -108,8 +106,7 @@ fun SignUpScreen(
                             )
                         )
                         Spacer(modifier = Modifier.height(12.dp))
-
-                        // Campo: Email
+                        // Campo: Email com validação
                         TextField(
                             value = email,
                             onValueChange = { email = it },
@@ -125,7 +122,6 @@ fun SignUpScreen(
                             )
                         )
                         Spacer(modifier = Modifier.height(12.dp))
-
                         // Campo: Senha
                         TextField(
                             value = senha,
@@ -143,12 +139,25 @@ fun SignUpScreen(
                             )
                         )
                         Spacer(modifier = Modifier.height(16.dp))
-
-                        // Botão Cadastrar
+                        // Botão de Cadastro com validação dos campos
                         Button(
                             onClick = {
                                 scope.launch {
-                                    signUpController.cadastrarUsuario(nome.trim(), email.trim(), senha.trim()) { sucesso ->
+                                    // Verifica se algum campo está vazio
+                                    if (nome.trim().isEmpty() || email.trim().isEmpty() || senha.trim().isEmpty()) {
+                                        Toast.makeText(context, "Preencha todos os campos!", Toast.LENGTH_SHORT).show()
+                                        return@launch
+                                    }
+                                    // Valida o email
+                                    if (!Patterns.EMAIL_ADDRESS.matcher(email.trim()).matches()) {
+                                        Toast.makeText(context, "Email inválido!", Toast.LENGTH_SHORT).show()
+                                        return@launch
+                                    }
+                                    signUpController.cadastrarUsuario(
+                                        nome = nome.trim(),
+                                        email = email.trim(),
+                                        senha = senha.trim()
+                                    ) { sucesso ->
                                         if (sucesso) {
                                             Toast.makeText(context, "Cadastro realizado com sucesso!", Toast.LENGTH_SHORT).show()
                                             onSignUpSuccess()
@@ -158,15 +167,20 @@ fun SignUpScreen(
                                     }
                                 }
                             },
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary), shape = RoundedCornerShape(8.dp)
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
+                            ),
+                            shape = RoundedCornerShape(8.dp)
                         ) {
-                            Text("Cadastrar", color = MaterialTheme.colorScheme.onPrimary)
+                            Text("Cadastrar", fontWeight = FontWeight.Bold, fontSize = 18.sp)
                         }
                     }
                 }
                 Spacer(modifier = Modifier.height(16.dp))
-
                 // Link para voltar à tela de login
                 TextButton(onClick = onNavigateToLogin) {
                     Text("Já tem conta? Faça login", color = MaterialTheme.colorScheme.onBackground)

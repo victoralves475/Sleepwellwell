@@ -33,16 +33,23 @@ fun TipsScreen(modifier: Modifier = Modifier) {
     }
 
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
+        horizontalAlignment = Alignment.Start,
         modifier = modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
         Text(
-            text = "Dicas para melhorar seu sono",
-            fontSize = 24.sp,
-            modifier = Modifier.padding(bottom = 24.dp)
+            text = "Melhore seu sono",
+            style = MaterialTheme.typography.headlineSmall.copy(fontSize = 20.sp),
+            color = MaterialTheme.colorScheme.onBackground
         )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "Dicas",
+            style = MaterialTheme.typography.headlineLarge.copy(fontSize = 50.sp),
+            color = MaterialTheme.colorScheme.onBackground
+        )
+        Spacer(modifier = Modifier.height(24.dp))
 
         LazyColumn(
             modifier = Modifier.fillMaxWidth(),
