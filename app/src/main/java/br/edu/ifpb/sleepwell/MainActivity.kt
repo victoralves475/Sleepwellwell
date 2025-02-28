@@ -18,6 +18,7 @@ import androidx.navigation.compose.rememberNavController
 import br.edu.ifpb.sleepwell.view.screens.AlarmScreen
 import br.edu.ifpb.sleepwell.model.SessionManager
 import br.edu.ifpb.sleepwell.ui.theme.SleepwellTheme
+import br.edu.ifpb.sleepwell.view.screens.BottomAppBar
 import br.edu.ifpb.sleepwell.view.screens.HomeScreen
 import br.edu.ifpb.sleepwell.view.screens.TipsScreen
 import br.edu.ifpb.sleepwell.view.screens.LoginScreen
@@ -42,7 +43,15 @@ class MainActivity : ComponentActivity() {
 fun SleepWellApp(context: Context) {
     val navController = rememberNavController()
 
-    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+    Scaffold(modifier = Modifier.fillMaxSize(), bottomBar = {
+        BottomAppBar(
+            onProfileClick = { navController.navigate("profile") },
+            onHomeClick = { navController.navigate("home") },
+            onLogout = {
+                SessionManager.currentUser = null
+                navController.navigate("login")
+            })
+    }) { innerPadding ->
         NavHost(
             navController = navController,
             startDestination = "splash",
@@ -79,11 +88,6 @@ fun SleepWellApp(context: Context) {
                     onAlarmClick = { navController.navigate("alarm") },
 //                    onNavigateToDiary = { navController.navigate("diary") },
                     onTipsClick = { navController.navigate("tips") },
-                    onLogout = {
-                        // Opcional: limpar a sessão no logout
-                        SessionManager.currentUser = null
-                        navController.navigate("login")
-                    }
                 )
             }
             // Tela de alarme
