@@ -24,7 +24,9 @@ import androidx.navigation.compose.rememberNavController
 import br.edu.ifpb.sleepwell.model.SessionManager
 import br.edu.ifpb.sleepwell.ui.theme.SleepwellTheme
 import br.edu.ifpb.sleepwell.view.screens.AlarmScreen
+import br.edu.ifpb.sleepwell.view.screens.AddDreamScreen
 import br.edu.ifpb.sleepwell.view.screens.BottomAppBar
+import br.edu.ifpb.sleepwell.view.screens.DreamDiaryScreen
 import br.edu.ifpb.sleepwell.view.screens.HomeScreen
 import br.edu.ifpb.sleepwell.view.screens.LoginScreen
 import br.edu.ifpb.sleepwell.view.screens.SignUpScreen
@@ -126,7 +128,8 @@ fun SleepWellApp(context: Context) {
                 HomeScreen(
                     userName = SessionManager.currentUser?.nome ?: "Usuário",
                     onAlarmClick = { navController.navigate("alarm") },
-                    onTipsClick = { navController.navigate("tips") }
+                    onNavigateToDiary = { navController.navigate("dream-diary") },
+                    onTipsClick = { navController.navigate("tips") },
                 )
             }
             // Tela de Alarme
@@ -137,7 +140,18 @@ fun SleepWellApp(context: Context) {
             composable("tips") {
                 TipsScreen()
             }
-            // Outras telas (como "profile") podem ser adicionadas aqui
+            // Tela do diario de sonhos
+            composable("dream-diary") {
+                DreamDiaryScreen (onAddDreamClick = {navController.navigate("add-dream")})
+            }
+
+            // Tela adicionar sonho
+            composable("add-dream") {
+                AddDreamScreen (
+                    onSaveSuccess = {navController.navigate("dream-diary")},
+                    onCancelClick = {navController.navigate("dream-diary")}
+                )
+            }
         }
     }
 }
