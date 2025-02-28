@@ -7,9 +7,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.OffsetMapping
+import androidx.compose.ui.text.input.TransformedText
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import br.edu.ifpb.sleepwell.controller.DiarioDeSonhoController
@@ -20,6 +24,7 @@ import br.edu.ifpb.sleepwell.controller.DiarioDeSonhoController
 @Composable
 fun AddDreamScreen(
     onSaveSuccess: () -> Unit,  // Navega para outra tela após salvar, se necessário
+    onCancelClick: () -> Unit
 ) {
     // Instancia o Controller diretamente na tela
     val diarioController = DiarioDeSonhoController()
@@ -79,11 +84,12 @@ fun AddDreamScreen(
             onValueChange = { data = it },
             label = { Text("Data do Sonho (dd/MM/yyyy)") },
             modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+//            visualTransformation = DataMaskVisualTransformation()
         )
 
         Spacer(modifier = Modifier.height(32.dp))
-// Botão de Salvar
+        // Botão de Salvar
         Button(
             onClick = {
                 // Chama o Controller diretamente para adicionar o Diário de Sonho
@@ -116,17 +122,72 @@ fun AddDreamScreen(
         ) {
             Text(text = "Salvar", fontWeight = FontWeight.Bold)
         }
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Botão de Cancelar
+        Button(
+            onClick = onCancelClick,  // Recebe a função externa para navegar ou cancelar
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.error,
+                contentColor = Color.White
+            )
+        ) {
+            Text(text = "Cancelar", fontWeight = FontWeight.Bold)
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-// Mensagem de Sucesso
+        // Mensagem de Sucesso
         if (mensagemSucesso.isNotEmpty()) {
             Text(text = mensagemSucesso, color = Color.Green)
         }
 
-// Mensagem de Erro
+        // Mensagem de Erro
         if (mensagemErro.isNotEmpty()) {
             Text(text = mensagemErro, color = MaterialTheme.colorScheme.error)
         }
+    }
+}
+
+
+
+// TODO CONSEGUIR APLICAR MASK!!!
+// Classe interna para aplicar a máscara de data (dd/MM/yyyy)
+class DataMaskVisualTransformation : VisualTransformation {
+    override fun filter(text: AnnotatedString): TransformedText {
+        // Remove tudo que não for número
+        val digits = text.text.filter { it.isDigit() }
+
+        // Aplica a máscara
+        val formatted = StringBuilder()
+        for (i in digits.indices) {
+            if (i == 2 || i == 4) {
+                formatted.append('/')
+            }
+            formatted.append(digits[i])
+        }
+
+        // Limita o tamanho a 10 caracteres (dd/MM/yyyy)
+        val masked = formatted.toString().take(10)
+
+        // Mapeamento correto do cursor
+        val offsetMapping = object : OffsetMapping {
+            override fun originalToTransformed(offset: Int): Int {
+                var transformed = offset
+                if (offset > 1) transformed += 1
+                if (offset > 3) transformed += 1
+                return transformed
+            }
+
+            override fun transformedToOriginal(offset: Int): Int {
+                var original = offset
+                if (offset > 2) original -= 1
+                if (offset > 5) original -= 1
+                return original
+            }
+        }
+
+        return TransformedText(AnnotatedString(masked), offsetMapping)
     }
 }
