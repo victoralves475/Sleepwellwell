@@ -48,9 +48,6 @@ fun HomeScreen(
     onAlarmClick: () -> Unit = {},     // Ação para ir para a tela de alarme
     onNavigateToDiary: () -> Unit = {},     // Ação para ir para a tela do diário
     onTipsClick: () -> Unit = {}, // Ação para ir para a tela dos lembretes
-    onHomeClick: () -> Unit = {},           // Ação para ir/voltar à tela Home
-    onProfileClick: () -> Unit = {},        // Ação para editar perfil
-    onLogout: () -> Unit = {},              // Ação para sair
     onFabClick: () -> Unit = {}             // Ação do FAB (botão azul central)
 ) {
     // Exemplo de lista de funcionalidades
@@ -91,45 +88,7 @@ fun HomeScreen(
         ?.lowercase()
         ?.replaceFirstChar { it.uppercase() } ?: ""
 
-    Scaffold(
-        bottomBar = {
-            BottomAppBar(
-                modifier = Modifier.fillMaxWidth(),
-                containerColor = MaterialTheme.colorScheme.background,
-                contentColor = MaterialTheme.colorScheme.onSurface
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // Ícone Home
-                    IconButton(onClick = onHomeClick) {
-                        Icon(Icons.Default.Home, contentDescription = "Home")
-                    }
-                    // Ícone Perfil dentro de um quadrado estilizado
-                    IconButton(onClick = onProfileClick, modifier = Modifier.size(56.dp)) {
-                        Surface(
-                            modifier = Modifier.fillMaxSize(),
-                            shape = MaterialTheme.shapes.medium, // Pode usar RoundedCornerShape(8.dp)
-                            color = MaterialTheme.colorScheme.primary
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Person,
-                                contentDescription = "Perfil",
-                                tint = MaterialTheme.colorScheme.onPrimary,
-                                modifier = Modifier.padding(12.dp)
-                            )
-                        }
-                    }
-                    // Ícone Logout
-                    IconButton(onClick = onLogout) {
-                        Icon(Icons.Default.ExitToApp, contentDescription = "Sair")
-                    }
-                }
-            }
-        },
-    ) { innerPadding ->
+    Scaffold(){ innerPadding ->
         Column(
             modifier = Modifier
                 .padding(innerPadding)
