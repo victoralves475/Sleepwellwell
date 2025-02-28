@@ -4,7 +4,7 @@ import com.google.firebase.firestore.DocumentId
 
 data class DiarioDeSonho (
     @DocumentId
-    val id: String? = null,
+    val id: String = "",
     val titulo: String = "",
     val relato: String = "",
     val data: String = ""
