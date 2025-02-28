@@ -50,7 +50,7 @@ fun SleepWellApp(context: Context) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
-            if (currentRoute !in listOf("login", "signup")) {
+            if (currentRoute !in listOf("login", "signup", "splash")) {
                 BottomAppBar(
                     onProfileClick = { navController.navigate("profile") },
                     onHomeClick = { navController.navigate("home") },

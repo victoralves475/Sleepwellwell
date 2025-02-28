@@ -94,7 +94,7 @@ fun TipCard(title: String, description:String, modifier: Modifier = Modifier) {
                 Text(
                     text = description,
                     color = MaterialTheme.colorScheme.onPrimary,
-                    textAlign = TextAlign.Justify,
+                    textAlign = TextAlign.Left,
                     fontSize = 16.sp,
                     lineHeight = 18.sp,
                     style = MaterialTheme.typography.bodySmall
