@@ -8,5 +8,4 @@ data class DiarioDeSonho (
     val titulo: String = "",
     val relato: String = "",
     val data: String = ""
-    val diarioDeSonho: List<DiarioDeSonho>
 )
