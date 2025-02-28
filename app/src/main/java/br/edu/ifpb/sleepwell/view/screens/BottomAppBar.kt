@@ -32,19 +32,19 @@ fun BottomAppBar(onHomeClick: () -> Unit, onProfileClick: () -> Unit, onLogout: 
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Ícone Home
-            IconButton(onClick = onHomeClick) {
-                Icon(Icons.Default.Home, contentDescription = "Home")
+            IconButton(onClick = onProfileClick) {
+                Icon(Icons.Default.Person, contentDescription = "Profile")
             }
             // Ícone Perfil dentro de um quadrado estilizado
-            IconButton(onClick = onProfileClick, modifier = Modifier.size(56.dp)) {
+            IconButton(onClick = onHomeClick, modifier = Modifier.size(56.dp)) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     shape = MaterialTheme.shapes.medium, // Pode usar RoundedCornerShape(8.dp)
                     color = MaterialTheme.colorScheme.primary
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = "Perfil",
+                        imageVector = Icons.Default.Home,
+                        contentDescription = "Home",
                         tint = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.padding(12.dp)
                     )

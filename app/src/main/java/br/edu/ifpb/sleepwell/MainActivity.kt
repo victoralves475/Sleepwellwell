@@ -7,25 +7,47 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import br.edu.ifpb.sleepwell.view.screens.AlarmScreen
 import br.edu.ifpb.sleepwell.model.SessionManager
 import br.edu.ifpb.sleepwell.ui.theme.SleepwellTheme
+import br.edu.ifpb.sleepwell.view.screens.AlarmScreen
 import br.edu.ifpb.sleepwell.view.screens.BottomAppBar
 import br.edu.ifpb.sleepwell.view.screens.HomeScreen
-import br.edu.ifpb.sleepwell.view.screens.TipsScreen
 import br.edu.ifpb.sleepwell.view.screens.LoginScreen
 import br.edu.ifpb.sleepwell.view.screens.SignUpScreen
 import br.edu.ifpb.sleepwell.view.screens.SplashScreen
+import br.edu.ifpb.sleepwell.view.screens.TipsScreen
+import kotlinx.coroutines.delay
+
+@Composable
+fun BlackTransitionScreen(
+    onTransitionFinished: () -> Unit
+) {
+    // Mostra um fundo preto por 1 segundo
+    LaunchedEffect(Unit) {
+        delay(500)
+        onTransitionFinished()
+    }
+    // Exibe um fundo preto que preenche a tela
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black)
+    )
+}
 
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.S)
@@ -50,7 +72,7 @@ fun SleepWellApp(context: Context) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
-            if (currentRoute !in listOf("login", "signup", "splash")) {
+            if (currentRoute !in listOf("login", "signup", "splash", "transition")) {
                 BottomAppBar(
                     onProfileClick = { navController.navigate("profile") },
                     onHomeClick = { navController.navigate("home") },
@@ -67,7 +89,7 @@ fun SleepWellApp(context: Context) {
             startDestination = "splash",
             modifier = Modifier.padding(innerPadding)
         ) {
-            // Tela inicial: Splash
+            // Tela de Splash
             composable("splash") {
                 SplashScreen(
                     onSplashFinished = {
@@ -77,37 +99,45 @@ fun SleepWellApp(context: Context) {
                     }
                 )
             }
-            // Tela de login
+            // Tela de Login
             composable("login") {
                 LoginScreen(
-                    onLoginSuccess = { navController.navigate("home") },
+                    onLoginSuccess = { navController.navigate("transition") },
                     onNavigateToSignUp = { navController.navigate("signup") }
                 )
             }
-            // Tela de cadastro
+            // Tela de Cadastro
             composable("signup") {
                 SignUpScreen(
                     onSignUpSuccess = { navController.popBackStack() },
                     onNavigateToLogin = { navController.navigate("login") }
                 )
             }
+            // Tela de transição: fundo preto por 1 segundo
+            composable("transition") {
+                BlackTransitionScreen {
+                    navController.navigate("home") {
+                        popUpTo("transition") { inclusive = true }
+                    }
+                }
+            }
             // Tela principal
             composable("home") {
                 HomeScreen(
                     userName = SessionManager.currentUser?.nome ?: "Usuário",
                     onAlarmClick = { navController.navigate("alarm") },
-//                    onNavigateToDiary = { navController.navigate("diary") },
-                    onTipsClick = { navController.navigate("tips") },
+                    onTipsClick = { navController.navigate("tips") }
                 )
             }
-            // Tela de alarme
+            // Tela de Alarme
             composable("alarm") {
                 AlarmScreen(context = context)
             }
-            // Tela de dicas
+            // Tela de Dicas
             composable("tips") {
                 TipsScreen()
             }
+            // Outras telas (como "profile") podem ser adicionadas aqui
         }
     }
 }
