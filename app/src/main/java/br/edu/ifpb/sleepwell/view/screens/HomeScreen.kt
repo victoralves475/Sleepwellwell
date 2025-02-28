@@ -7,7 +7,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.Home
@@ -32,7 +31,8 @@ data class FeatureItem(
     val description: String,
     val icon: ImageVector,     // Ícone específico
     val iconBgColor: Color,    // Cor de fundo do ícone
-    val count: Int = 0
+    val count: Int = 0,
+    val onClick: () -> Unit = {}
 )
 
 
@@ -46,12 +46,10 @@ fun HomeScreen(
     userName: String,
     efficiency: Float = 0.76f,
     onTabSelected: (String) -> Unit = {},   // "Visão Geral" ou "Histórico de Sono"
-    onFeatureClick: (FeatureItem) -> Unit = {},
-    onHomeClick: () -> Unit = {},           // Ação para ir/voltar à tela Home
-    onProfileClick: () -> Unit = {},        // Ação para editar perfil
-    onLogout: () -> Unit = {},              // Ação para sair
-    onFabClick: () -> Unit = {},     // Ação do FAB (botão azul central)
-    onTipsClick: () -> Unit = {}
+    onAlarmClick: () -> Unit = {},     // Ação para ir para a tela de alarme
+    onNavigateToDiary: () -> Unit = {},     // Ação para ir para a tela do diário
+    onTipsClick: () -> Unit = {}, // Ação para ir para a tela dos lembretes
+    onFabClick: () -> Unit = {}             // Ação do FAB (botão azul central)
 ) {
     // Exemplo de lista de funcionalidades
     val features = listOf(
@@ -59,13 +57,15 @@ fun HomeScreen(
             title = "Diário dos Sonhos",
             description = "Nunca esqueça",
             icon = Icons.Default.AccountBox,
-            iconBgColor = Color(0xFFE0E0E0) // Cinza claro, por exemplo
+            iconBgColor = Color(0xFFE0E0E0), // Cinza claro, por exemplo
+            onClick = onNavigateToDiary
         ),
         FeatureItem(
             title = "Dicas",
             description = "Durma com os anjos",
-            icon = Icons.Default.Star,
-            iconBgColor = Color(0xFFFFEB3B) // Verde claro
+            icon = Icons.Default.DateRange,
+            iconBgColor = Color(0xFF76FF03), // Verde claro
+            onClick = onTipsClick
         ),
         FeatureItem(
             title = "Monitoramento de Ciclos",
@@ -77,7 +77,8 @@ fun HomeScreen(
             title = "Despertadores",
             description = "Na hora certa",
             icon = Icons.Default.Notifications,
-            iconBgColor = Color(0xFF00E5FF) // Ciano claro
+            iconBgColor = Color(0xFF00E5FF), // Ciano claro
+            onClick = onAlarmClick
         )
     )
 
@@ -88,45 +89,7 @@ fun HomeScreen(
         ?.lowercase()
         ?.replaceFirstChar { it.uppercase() } ?: ""
 
-    Scaffold(
-        bottomBar = {
-            BottomAppBar(
-                modifier = Modifier.fillMaxWidth(),
-                containerColor = MaterialTheme.colorScheme.background,
-                contentColor = MaterialTheme.colorScheme.onSurface
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // Ícone Home
-                    IconButton(onClick = onHomeClick) {
-                        Icon(Icons.Default.Home, contentDescription = "Home")
-                    }
-                    // Ícone Perfil dentro de um quadrado estilizado
-                    IconButton(onClick = onProfileClick, modifier = Modifier.size(56.dp)) {
-                        Surface(
-                            modifier = Modifier.fillMaxSize(),
-                            shape = MaterialTheme.shapes.medium, // Pode usar RoundedCornerShape(8.dp)
-                            color = MaterialTheme.colorScheme.primary
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Person,
-                                contentDescription = "Perfil",
-                                tint = MaterialTheme.colorScheme.onPrimary,
-                                modifier = Modifier.padding(12.dp)
-                            )
-                        }
-                    }
-                    // Ícone Logout
-                    IconButton(onClick = onLogout) {
-                        Icon(Icons.Default.ExitToApp, contentDescription = "Sair")
-                    }
-                }
-            }
-        },
-    ) { innerPadding ->
+    Scaffold(){ innerPadding ->
         Column(
             modifier = Modifier
                 .padding(innerPadding)
@@ -184,9 +147,7 @@ fun HomeScreen(
                 contentPadding = PaddingValues(4.dp)
             ) {
                 items(features) { feature ->
-                    FeatureCard(featureItem = feature) {
-                        onFeatureClick(feature)
-                    }
+                    FeatureCard(featureItem = feature, onClick = feature.onClick)
                 }
             }
         }
@@ -285,8 +246,3 @@ fun FeatureCard(featureItem: FeatureItem, onClick: () -> Unit) {
         }
     }
 }
-
-
-
-
-
