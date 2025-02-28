@@ -49,7 +49,8 @@ fun HomeScreen(
     onHomeClick: () -> Unit = {},           // Ação para ir/voltar à tela Home
     onProfileClick: () -> Unit = {},        // Ação para editar perfil
     onLogout: () -> Unit = {},              // Ação para sair
-    onFabClick: () -> Unit = {}             // Ação do FAB (botão azul central)
+    onFabClick: () -> Unit = {},     // Ação do FAB (botão azul central)
+    onTipsClick: () -> Unit = {}
 ) {
     // Exemplo de lista de funcionalidades
     val features = listOf(
