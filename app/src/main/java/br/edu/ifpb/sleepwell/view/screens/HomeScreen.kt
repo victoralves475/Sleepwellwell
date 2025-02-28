@@ -63,8 +63,8 @@ fun HomeScreen(
         FeatureItem(
             title = "Dicas",
             description = "Durma com os anjos",
-            icon = Icons.Default.DateRange,
-            iconBgColor = Color(0xFF76FF03), // Verde claro
+            icon = Icons.Default.Star,
+            iconBgColor = Color(0xFFeac918), // Amarelo
             onClick = onTipsClick
         ),
         FeatureItem(
