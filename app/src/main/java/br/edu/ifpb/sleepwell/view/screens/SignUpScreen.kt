@@ -93,7 +93,7 @@ fun SignUpScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         // Campo: Nome
-                        OutlinedTextField(
+                        TextField(
                             value = nome,
                             onValueChange = { nome = it },
                             label = { Text("Nome", color = MaterialTheme.colorScheme.onSurface) },
@@ -109,7 +109,7 @@ fun SignUpScreen(
                         Spacer(modifier = Modifier.height(12.dp))
 
                         // Campo: Email
-                        OutlinedTextField(
+                        TextField(
                             value = email,
                             onValueChange = { email = it },
                             label = { Text("Email", color = MaterialTheme.colorScheme.onSurface) },
@@ -126,7 +126,7 @@ fun SignUpScreen(
                         Spacer(modifier = Modifier.height(12.dp))
 
                         // Campo: Senha
-                        OutlinedTextField(
+                        TextField(
                             value = senha,
                             onValueChange = { senha = it },
                             label = { Text("Senha", color = MaterialTheme.colorScheme.onSurface) },

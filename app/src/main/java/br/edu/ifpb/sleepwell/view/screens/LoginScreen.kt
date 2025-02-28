@@ -89,7 +89,7 @@ fun LoginScreen(
                             .fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        OutlinedTextField(
+                        TextField(
                             value = email,
                             onValueChange = { email = it },
                             label = { Text("Email", color = MaterialTheme.colorScheme.onSurface) },
@@ -105,7 +105,7 @@ fun LoginScreen(
                         )
                         Spacer(modifier = Modifier.height(12.dp))
 
-                        OutlinedTextField(
+                        TextField(
                             value = senha,
                             onValueChange = { senha = it },
                             label = { Text("Senha", color = MaterialTheme.colorScheme.onSurface) },
