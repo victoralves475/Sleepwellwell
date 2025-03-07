@@ -38,12 +38,11 @@ import kotlinx.coroutines.delay
 fun BlackTransitionScreen(
     onTransitionFinished: () -> Unit
 ) {
-    // Mostra um fundo preto por 1 segundo
+    // Mostra um fundo preto por 500 ms
     LaunchedEffect(Unit) {
         delay(500)
         onTransitionFinished()
     }
-    // Exibe um fundo preto que preenche a tela
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -74,7 +73,7 @@ fun SleepWellApp(context: Context) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
-            if (currentRoute !in listOf("login", "signup", "splash", "transition")) {
+            if (currentRoute !in listOf("login", "signup", "splash", "transition", "add-dream")) {
                 BottomAppBar(
                     onProfileClick = { navController.navigate("profile") },
                     onHomeClick = { navController.navigate("home") },
@@ -115,7 +114,7 @@ fun SleepWellApp(context: Context) {
                     onNavigateToLogin = { navController.navigate("login") }
                 )
             }
-            // Tela de transição: fundo preto por 1 segundo
+            // Tela de Transição (fundo preto por 500ms)
             composable("transition") {
                 BlackTransitionScreen {
                     navController.navigate("home") {
@@ -123,13 +122,13 @@ fun SleepWellApp(context: Context) {
                     }
                 }
             }
-            // Tela principal
+            // Tela Principal (Home)
             composable("home") {
                 HomeScreen(
                     userName = SessionManager.currentUser?.nome ?: "Usuário",
                     onAlarmClick = { navController.navigate("alarm") },
                     onNavigateToDiary = { navController.navigate("dream-diary") },
-                    onTipsClick = { navController.navigate("tips") },
+                    onTipsClick = { navController.navigate("tips") }
                 )
             }
             // Tela de Alarme
@@ -140,16 +139,25 @@ fun SleepWellApp(context: Context) {
             composable("tips") {
                 TipsScreen()
             }
-            // Tela do diario de sonhos
+            // Tela do Diário de Sonhos
             composable("dream-diary") {
-                DreamDiaryScreen (onAddDreamClick = {navController.navigate("add-dream")})
+                DreamDiaryScreen(
+                    onAddDreamClick = { navController.navigate("add-dream") }
+                )
             }
-
-            // Tela adicionar sonho
+            // Tela de Adição de Sonho
             composable("add-dream") {
-                AddDreamScreen (
-                    onSaveSuccess = {navController.navigate("dream-diary")},
-                    onCancelClick = {navController.navigate("dream-diary")}
+                AddDreamScreen(
+                    onSaveSuccess = {
+                        navController.navigate("dream-diary") {
+                            popUpTo("add-dream") { inclusive = true }
+                        }
+                    },
+                    onCancelClick = {
+                        navController.navigate("dream-diary") {
+                            popUpTo("add-dream") { inclusive = true }
+                        }
+                    }
                 )
             }
         }
