@@ -131,9 +131,6 @@ Este projeto está licenciado sob o IFPB.
 
 ---
 
-## Agradecimentos
-
 - **Firebase:** Por fornecer uma solução robusta de banco de dados na nuvem.
 - **Jetpack Compose:** Por facilitar o desenvolvimento de interfaces modernas e declarativas.
 - **Material Design:** Por inspirar o design e a aparência do aplicativo.
-```
