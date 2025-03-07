@@ -4,11 +4,16 @@ import br.edu.ifpb.sleepwell.model.SessionManager
 import br.edu.ifpb.sleepwell.model.data.repository.UsuarioRepository
 import br.edu.ifpb.sleepwell.model.entity.DiarioDeSonho
 import br.edu.ifpb.sleepwell.model.entity.Usuario
-
 import com.google.firebase.Timestamp
 import java.text.SimpleDateFormat
 import java.util.Locale
 
+/**
+ * DiárioDeSonhoController gerencia as operações relacionadas aos diários de sonho,
+ * como adicionar, listar e excluir diários para o usuário autenticado.
+ *
+ * Esse controller utiliza o UsuarioRepository para interagir com o Firestore.
+ */
 class DiarioDeSonhoController(private val repository: UsuarioRepository = UsuarioRepository()) {
 
     /**
@@ -17,8 +22,8 @@ class DiarioDeSonhoController(private val repository: UsuarioRepository = Usuari
      * @param titulo Título do Diário de Sonho.
      * @param relato Relato do Diário de Sonho.
      * @param data Data do Diário de Sonho no formato "dd/MM/yyyy".
-     * @param onSuccess Callback em caso de sucesso.
-     * @param onFailure Callback em caso de falha.
+     * @param onSuccess Callback chamado em caso de sucesso na operação.
+     * @param onFailure Callback chamado em caso de falha, passando a exceção.
      */
     fun adicionarDiarioDeSonho(
         titulo: String,
@@ -27,16 +32,18 @@ class DiarioDeSonhoController(private val repository: UsuarioRepository = Usuari
         onSuccess: () -> Unit,
         onFailure: (Exception) -> Unit
     ) {
+        // Obtém o ID do usuário atualmente autenticado.
         val usuarioId = SessionManager.currentUser?.id ?: return
 
-        // Cria o objeto DiarioDeSonho com a data como String no formato "dd/MM/yyyy"
+        // Cria um objeto DiarioDeSonho com os dados fornecidos.
+        // Aqui, a data é salva exatamente no formato "dd/MM/yyyy".
         val diarioDeSonho = DiarioDeSonho(
             titulo = titulo,
             relato = relato,
-            data = data  // Salva a data exatamente como "dd/MM/yyyy"
+            data = data
         )
 
-        // Chama o método do UsuarioRepository para salvar
+        // Chama o método do repository para adicionar o diário de sonho ao Firestore.
         repository.adicionarDiarioDeSonho(
             usuarioId,
             diarioDeSonho,
@@ -48,37 +55,39 @@ class DiarioDeSonhoController(private val repository: UsuarioRepository = Usuari
     /**
      * Lista todos os Diários de Sonho do usuário autenticado.
      *
-     * @param onSuccess Callback com a lista de diários em caso de sucesso.
-     * @param onFailure Callback em caso de falha.
+     * @param onSuccess Callback que recebe uma lista de DiárioDeSonho em caso de sucesso.
+     * @param onFailure Callback chamado em caso de falha, passando a exceção.
      */
     fun listarDiariosDeSonho(
         onSuccess: (List<DiarioDeSonho>) -> Unit,
         onFailure: (Exception) -> Unit
     ) {
+        // Obtém o ID do usuário atualmente autenticado.
         val usuarioId = SessionManager.currentUser?.id ?: return
 
-        // Chama o repository para buscar os diários do usuário
+        // Chama o método do repository para buscar os diários de sonho do usuário.
         repository.listarDiariosDeSonho(
             usuarioId,
-            callback = {diarios -> onSuccess(diarios)}
-        );
+            callback = { diarios -> onSuccess(diarios) }
+        )
     }
 
     /**
-     * Exclui um Diário de Sonho para o usuário autenticado.
+     * Exclui um Diário de Sonho do usuário autenticado.
      *
      * @param diarioId ID do Diário de Sonho a ser excluído.
-     * @param onSuccess Callback em caso de sucesso.
-     * @param onFailure Callback em caso de falha.
+     * @param onSuccess Callback chamado em caso de sucesso.
+     * @param onFailure Callback chamado em caso de falha, passando a exceção.
      */
     fun excluirDiarioDeSonho(
         diarioId: String,
         onSuccess: () -> Unit,
         onFailure: (Exception) -> Unit
     ) {
+        // Obtém o ID do usuário atualmente autenticado.
         val usuarioId = SessionManager.currentUser?.id ?: return
 
-        // Chama o repository para excluir o diário do usuário
+        // Chama o método do repository para remover o diário de sonho do usuário.
         repository.removerDiarioDeSonho(
             usuarioId,
             diarioId,

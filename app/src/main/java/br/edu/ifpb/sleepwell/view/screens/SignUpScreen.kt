@@ -7,10 +7,28 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -24,6 +42,22 @@ import br.edu.ifpb.sleepwell.R
 import br.edu.ifpb.sleepwell.controller.SignUpController
 import kotlinx.coroutines.launch
 
+/**
+ * SignUpScreen exibe a tela de cadastro do usuário.
+ *
+ * Essa tela apresenta:
+ * - Uma imagem de fundo (onda azul) com um overlay translúcido para contraste.
+ * - Um formulário contido em um Card para cadastro, com os campos de Nome, Email e Senha.
+ * - Validação que impede o cadastro se algum campo estiver vazio ou se o email não for válido.
+ * - Um botão "Cadastrar" que, ao ser clicado, tenta cadastrar o usuário e, em caso de sucesso,
+ *   aciona o callback onSignUpSuccess() para redirecionar para a tela desejada.
+ * - Um TextButton para navegar para a tela de login caso o usuário já tenha uma conta.
+ *
+ * @param onSignUpSuccess Callback acionado quando o cadastro for realizado com sucesso.
+ * @param onNavigateToLogin Callback acionado para navegar para a tela de login.
+ * @param signUpController Instância do controlador de cadastro (SignUpController) que gerencia
+ *                         a comunicação com o Firestore.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUpScreen(
@@ -31,25 +65,32 @@ fun SignUpScreen(
     onNavigateToLogin: () -> Unit,
     signUpController: SignUpController = SignUpController()
 ) {
+    // Estados para armazenar os valores digitados pelo usuário
     var nome by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var senha by remember { mutableStateOf("") }
+
+    // Contexto para exibir Toasts
     val context = LocalContext.current
+    // Escopo de coroutine para operações assíncronas (ex.: cadastro)
     val scope = rememberCoroutineScope()
 
+    // Box principal que preenche a tela e define o fundo (com overlay)
     Box(modifier = Modifier.fillMaxSize()) {
-        // Imagem de fundo (onda azul) com overlay para contraste
+        // Exibe a imagem de fundo (onda azul)
         Image(
-            painter = painterResource(id = R.drawable.wave_background),
+            painter = painterResource(id = R.drawable.wave_background), // Nome do arquivo de imagem na pasta res/drawable
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
         )
+        // Overlay translúcido para melhorar a legibilidade dos elementos
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background.copy(alpha = 0.8f))
         ) {
+            // Organiza o conteúdo do formulário em uma Column centralizada
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -57,7 +98,7 @@ fun SignUpScreen(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Título da Tela
+                // Título da tela
                 Text(
                     text = "Cadastro",
                     style = MaterialTheme.typography.headlineLarge.copy(
@@ -67,7 +108,7 @@ fun SignUpScreen(
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Spacer(modifier = Modifier.height(4.dp))
-                // Subtítulo
+                // Subtítulo com instrução
                 Text(
                     text = "Preencha os campos para criar sua conta",
                     style = MaterialTheme.typography.bodyMedium,
@@ -75,7 +116,7 @@ fun SignUpScreen(
                 )
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Card com os campos do formulário
+                // Card que agrupa os campos do formulário
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -90,7 +131,7 @@ fun SignUpScreen(
                             .fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        // Campo: Nome
+                        // Campo de entrada para o nome
                         TextField(
                             value = nome,
                             onValueChange = { nome = it },
@@ -106,7 +147,7 @@ fun SignUpScreen(
                             )
                         )
                         Spacer(modifier = Modifier.height(12.dp))
-                        // Campo: Email com validação
+                        // Campo de entrada para o email
                         TextField(
                             value = email,
                             onValueChange = { email = it },
@@ -122,7 +163,7 @@ fun SignUpScreen(
                             )
                         )
                         Spacer(modifier = Modifier.height(12.dp))
-                        // Campo: Senha
+                        // Campo de entrada para a senha (oculta o texto digitado)
                         TextField(
                             value = senha,
                             onValueChange = { senha = it },
@@ -139,7 +180,7 @@ fun SignUpScreen(
                             )
                         )
                         Spacer(modifier = Modifier.height(16.dp))
-                        // Botão de Cadastro com validação dos campos
+                        // Botão de cadastro que realiza validações antes de enviar os dados
                         Button(
                             onClick = {
                                 scope.launch {
@@ -148,11 +189,12 @@ fun SignUpScreen(
                                         Toast.makeText(context, "Preencha todos os campos!", Toast.LENGTH_SHORT).show()
                                         return@launch
                                     }
-                                    // Valida o email
+                                    // Valida se o email tem o formato correto utilizando Patterns.EMAIL_ADDRESS
                                     if (!Patterns.EMAIL_ADDRESS.matcher(email.trim()).matches()) {
                                         Toast.makeText(context, "Email inválido!", Toast.LENGTH_SHORT).show()
                                         return@launch
                                     }
+                                    // Chama o controller para cadastrar o usuário
                                     signUpController.cadastrarUsuario(
                                         nome = nome.trim(),
                                         email = email.trim(),
@@ -160,6 +202,7 @@ fun SignUpScreen(
                                     ) { sucesso ->
                                         if (sucesso) {
                                             Toast.makeText(context, "Cadastro realizado com sucesso!", Toast.LENGTH_SHORT).show()
+                                            // Chama o callback onSignUpSuccess para redirecionar a outra tela
                                             onSignUpSuccess()
                                         } else {
                                             Toast.makeText(context, "Falha no cadastro!", Toast.LENGTH_SHORT).show()
@@ -181,9 +224,12 @@ fun SignUpScreen(
                     }
                 }
                 Spacer(modifier = Modifier.height(16.dp))
-                // Link para voltar à tela de login
+                // Botão para navegar para a tela de login
                 TextButton(onClick = onNavigateToLogin) {
-                    Text("Já tem conta? Faça login", color = MaterialTheme.colorScheme.onBackground)
+                    Text(
+                        text = "Já tem conta? Cadastre-se",
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
                 }
             }
         }

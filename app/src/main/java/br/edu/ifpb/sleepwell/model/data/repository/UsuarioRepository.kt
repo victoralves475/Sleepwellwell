@@ -5,17 +5,25 @@ import br.edu.ifpb.sleepwell.model.entity.Usuario
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.toObject
 
+/**
+ * UsuarioRepository é responsável por gerenciar as operações de autenticação e
+ * manipulação dos dados do usuário no Firestore, bem como gerenciar os diários de sonho
+ * do usuário (criar, listar, atualizar e remover).
+ */
 class UsuarioRepository {
 
+    // Instância do Firestore para acessar o banco de dados
     private val db = FirebaseFirestore.getInstance()
 
     /**
      * Realiza o login verificando se existe um usuário com o email informado e
-     * se a senha coincide com a armazenada.
+     * se a senha corresponde à armazenada.
      *
      * @param email Email do usuário.
      * @param senha Senha do usuário.
-     * @param callback Retorna (true, usuário) em caso de sucesso, ou (false, null) se falhar.
+     * @param callback Função de callback que retorna:
+     *   - true e o objeto Usuario se o login for bem-sucedido;
+     *   - false e null em caso de falha.
      */
     fun login(email: String, senha: String, callback: (Boolean, Usuario?) -> Unit) {
         db.collection("usuarios")
@@ -23,7 +31,9 @@ class UsuarioRepository {
             .get()
             .addOnSuccessListener { snapshot ->
                 if (!snapshot.isEmpty) {
+                    // Converte o primeiro documento encontrado em um objeto Usuario
                     val usuario = snapshot.documents[0].toObject<Usuario>()
+                    // Verifica se o usuário existe e se a senha confere (após remover espaços)
                     if (usuario != null && usuario.senha.trim() == senha.trim()) {
                         callback(true, usuario)
                     } else {
@@ -41,26 +51,30 @@ class UsuarioRepository {
     /**
      * Cria um novo usuário no Firestore.
      *
-     * @param usuario Dados do usuário a ser criado.
-     * @param callback Retorna true se o cadastro for realizado com sucesso; false caso contrário.
+     * @param usuario Objeto Usuario contendo os dados a serem salvos.
+     * @param callback Função de callback que retorna true se o cadastro for realizado com sucesso;
+     *                 false caso contrário.
      */
     fun criarUsuario(usuario: Usuario, callback: (Boolean) -> Unit) {
-        // Gera um ID único para o novo documento
+        // Gera um ID único para o novo usuário
         val id = db.collection("usuarios").document().id
+        // Cria uma cópia do objeto com o ID gerado
         val novoUsuario = usuario.copy(id = id)
+        // Salva o novo usuário na coleção "usuarios"
         db.collection("usuarios")
             .document(id)
             .set(novoUsuario)
             .addOnSuccessListener { callback(true) }
             .addOnFailureListener { callback(false) }
     }
+
     /**
-     * Adiciona um novo Diário de Sonho na subcoleção do usuário.
+     * Adiciona um novo Diário de Sonho na subcoleção "diarios" do usuário autenticado.
      *
      * @param usuarioId ID do usuário autenticado.
-     * @param diarioDeSonho Dados do diário de sonho a ser adicionado.
-     * @param onSuccess Callback em caso de sucesso.
-     * @param onFailure Callback em caso de falha.
+     * @param diarioDeSonho Objeto DiarioDeSonho contendo os dados do diário.
+     * @param onSuccess Callback chamado em caso de sucesso.
+     * @param onFailure Callback chamado em caso de falha, recebendo a exceção.
      */
     fun adicionarDiarioDeSonho(
         usuarioId: String,
@@ -68,16 +82,16 @@ class UsuarioRepository {
         onSuccess: () -> Unit,
         onFailure: (Exception) -> Unit
     ) {
-        // Gera um ID único para o novo documento
+        // Gera um ID único para o novo diário na subcoleção "diarios"
         val diarioId = db.collection("usuarios")
             .document(usuarioId)
             .collection("diarios")
             .document().id
 
-        // Cria um novo DiarioDeSonho com o ID atribuído
+        // Cria um novo objeto Diário de Sonho com o ID atribuído
         val novoDiario = diarioDeSonho.copy(id = diarioId)
 
-        // Salva o diário usando o ID gerado
+        // Salva o novo diário na subcoleção "diarios" do usuário
         db.collection("usuarios")
             .document(usuarioId)
             .collection("diarios")
@@ -95,7 +109,8 @@ class UsuarioRepository {
      * Lista todos os Diários de Sonho do usuário autenticado.
      *
      * @param usuarioId ID do usuário autenticado.
-     * @param callback Retorna a lista de diários em caso de sucesso; lista vazia em caso de falha.
+     * @param callback Função de callback que recebe uma lista de DiárioDeSonho.
+     *                 Se a operação falhar, retorna uma lista vazia.
      */
     fun listarDiariosDeSonho(
         usuarioId: String,
@@ -106,6 +121,7 @@ class UsuarioRepository {
             .collection("diarios")
             .get()
             .addOnSuccessListener { snapshot ->
+                // Mapeia os documentos para objetos DiarioDeSonho, ignorando os que não puderem ser convertidos
                 val diarios = snapshot.documents.mapNotNull { it.toObject<DiarioDeSonho>() }
                 callback(diarios)
             }
@@ -115,12 +131,12 @@ class UsuarioRepository {
     }
 
     /**
-     * Remove um Diário de Sonho específico.
+     * Remove um Diário de Sonho específico da subcoleção "diarios" do usuário autenticado.
      *
      * @param usuarioId ID do usuário autenticado.
-     * @param diarioId ID do diário a ser removido.
-     * @param onSuccess Callback em caso de sucesso.
-     * @param onFailure Callback em caso de falha.
+     * @param diarioId ID do diário que deve ser removido.
+     * @param onSuccess Callback chamado em caso de sucesso.
+     * @param onFailure Callback chamado em caso de falha, recebendo a exceção.
      */
     fun removerDiarioDeSonho(
         usuarioId: String,
@@ -142,13 +158,13 @@ class UsuarioRepository {
     }
 
     /**
-     * Atualiza um Diário de Sonho específico.
+     * Atualiza um Diário de Sonho específico na subcoleção "diarios" do usuário autenticado.
      *
      * @param usuarioId ID do usuário autenticado.
-     * @param diarioId ID do diário a ser atualizado.
-     * @param diarioDeSonho Dados atualizados do diário de sonho.
-     * @param onSuccess Callback em caso de sucesso.
-     * @param onFailure Callback em caso de falha.
+     * @param diarioId ID do diário que deve ser atualizado.
+     * @param diarioDeSonho Objeto Diário de Sonho com os dados atualizados.
+     * @param onSuccess Callback chamado em caso de sucesso.
+     * @param onFailure Callback chamado em caso de falha, recebendo a exceção.
      */
     fun atualizarDiarioDeSonho(
         usuarioId: String,
@@ -170,4 +186,3 @@ class UsuarioRepository {
             }
     }
 }
-
