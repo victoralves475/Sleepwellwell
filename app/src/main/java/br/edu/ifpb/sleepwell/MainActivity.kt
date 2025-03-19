@@ -33,6 +33,13 @@ import br.edu.ifpb.sleepwell.view.screens.SignUpScreen
 import br.edu.ifpb.sleepwell.view.screens.SplashScreen
 import br.edu.ifpb.sleepwell.view.screens.TipsScreen
 import kotlinx.coroutines.delay
+import android.app.Application
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import androidx.work.*
+import br.edu.ifpb.sleepwell.utils.DicaWorker
+import java.util.concurrent.TimeUnit
+import java.util.Calendar
 
 @Composable
 fun BlackTransitionScreen(
@@ -50,6 +57,54 @@ fun BlackTransitionScreen(
     )
 }
 
+class SleepWellApp : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        createNotificationChannel()
+    }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                "sleep_tips_channel",
+                "Dicas de Sono",
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = "Notificações com dicas para melhorar seu sono."
+            }
+
+            val notificationManager = getSystemService(NotificationManager::class.java)
+            notificationManager?.createNotificationChannel(channel)
+        }
+    }
+}
+
+fun agendarNotificacaoDiaria(context: Context) {
+    val agora = Calendar.getInstance()
+    val proximaExecucao = Calendar.getInstance().apply {
+        set(Calendar.HOUR_OF_DAY, 22)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+
+        if (timeInMillis <= agora.timeInMillis) {
+            add(Calendar.DAY_OF_MONTH, 1)  // Agendar para o próximo dia se já passou das 22h
+        }
+    }
+
+    val tempoAteExecucao = proximaExecucao.timeInMillis - agora.timeInMillis
+    val workRequest = OneTimeWorkRequestBuilder<DicaWorker>()
+        .setInitialDelay(tempoAteExecucao, TimeUnit.MILLISECONDS)
+        .build()
+
+    WorkManager.getInstance(context).enqueueUniqueWork(
+        "notificacao_diaria",
+        ExistingWorkPolicy.REPLACE,
+        workRequest
+    )
+}
+
+
+
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.S)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,9 +114,11 @@ class MainActivity : ComponentActivity() {
             SleepwellTheme {
                 SleepWellApp(context = this)
             }
+            agendarNotificacaoDiaria(this)
         }
     }
 }
+
 
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
