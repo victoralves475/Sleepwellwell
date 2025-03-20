@@ -67,9 +67,7 @@ class AlarmService : Service() {
     /**
      * onBind não é utilizado para serviços iniciados (startService), portanto retornamos null.
      */
-    override fun onBind(intent: Intent?): IBinder? {
-        return null
-    }
+    override fun onBind(intent: Intent?): IBinder? = null
 
     /**
      * startForegroundService configura e inicia o serviço em primeiro plano.
@@ -93,11 +91,23 @@ class AlarmService : Service() {
             manager.createNotificationChannel(channel)
         }
 
-        // Cria a notificação que será exibida enquanto o serviço estiver em primeiro plano
+        // Cria um PendingIntent para a ação "Desativar"
+        val stopIntent = Intent(this, AlarmDisableReceiver::class.java).apply {
+            action = "ACTION_STOP_ALARM"
+        }
+        val pendingStopIntent = PendingIntent.getBroadcast(
+            this,
+            0,
+            stopIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        // Constrói a notificação com a ação para desativar o alarme
         val notification = NotificationCompat.Builder(this, channelId)
             .setContentTitle("Alarme Ativo")
             .setContentText("O alarme está tocando.")
             .setSmallIcon(R.drawable.alarm) // Ícone definido na pasta res/drawable
+            .addAction(android.R.drawable.ic_media_pause, "Desativar", pendingStopIntent)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .build()
 

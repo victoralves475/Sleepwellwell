@@ -50,6 +50,15 @@
             android:name=".alarm.AlarmReceiver"
             android:enabled="true"
             android:exported="false" />
+        <receiver
+            android:name="br.edu.ifpb.sleepwell.alarm.AlarmDisableReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="ACTION_STOP_ALARM"/>
+            </intent-filter>
+        </receiver>
+
         <service
             android:name=".alarm.AlarmService"
             android:exported="false"

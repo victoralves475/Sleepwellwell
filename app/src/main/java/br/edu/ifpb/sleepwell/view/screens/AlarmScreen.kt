@@ -21,6 +21,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import br.edu.ifpb.sleepwell.alarm.AlarmDisableReceiver
 import br.edu.ifpb.sleepwell.alarm.AlarmReceiver
 import java.text.SimpleDateFormat
 import java.util.*
@@ -161,8 +162,7 @@ fun AlarmScreen(context: Context) {
 
             // Linha com botões para "Cancelar" e "Parar" o alarme
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Button(
                     onClick = { cancelAlarm(context) },
@@ -176,26 +176,24 @@ fun AlarmScreen(context: Context) {
                 ) {
                     Text("Cancelar", color = MaterialTheme.colorScheme.onSecondary, fontSize = 16.sp)
                 }
-                Spacer(modifier = Modifier.width(16.dp))
-                Button(
-                    onClick = { stopAlarm(context) },
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(40.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.secondary
-                    ),
-                    shape = RoundedCornerShape(8.dp)
-                ) {
-                    Text("Parar", color = MaterialTheme.colorScheme.onSecondary, fontSize = 16.sp)
-                }
+//                Button(
+//                    onClick = { stopAlarm(context) },
+//                    modifier = Modifier
+//                        .weight(1f)
+//                        .height(40.dp),
+//                    colors = ButtonDefaults.buttonColors(
+//                        containerColor = MaterialTheme.colorScheme.secondary
+//                    ),
+//                    shape = RoundedCornerShape(8.dp)
+//                ) {
+//                    Text("Parar", color = MaterialTheme.colorScheme.onSecondary, fontSize = 16.sp)
+//                }
             }
-            Spacer(modifier = Modifier.height(16.dp))
 
             // Exibe o tempo do alarme configurado, se disponível
             if (selectedTime.isNotEmpty()) {
                 Text(
-                    text = "Alarm Set For: $selectedTime",
+                    text = "Alarme criado: $selectedTime",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onBackground
                 )
@@ -287,7 +285,7 @@ fun cancelAlarm(context: Context) {
     )
     val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
     alarmManager.cancel(pendingIntent)
-    Toast.makeText(context, "Alarm canceled", Toast.LENGTH_SHORT).show()
+    Toast.makeText(context, "Alarme cancelado", Toast.LENGTH_SHORT).show()
 }
 
 /**
@@ -296,8 +294,8 @@ fun cancelAlarm(context: Context) {
  * @param context Contexto para acessar o AlarmManager e enviar broadcast para parar o alarme.
  */
 fun stopAlarm(context: Context) {
-    val intent = Intent(context, AlarmReceiver::class.java).apply {
-        putExtra("Service1", "Stop")
+    val intent = Intent(context, AlarmDisableReceiver::class.java).apply {
+        action = "br.edu.ifpb.sleepwell.ALARM_DISABLE"
     }
     val pendingIntent = PendingIntent.getBroadcast(
         context, 2407, intent, PendingIntent.FLAG_NO_CREATE or PendingIntent.FLAG_IMMUTABLE
@@ -307,5 +305,5 @@ fun stopAlarm(context: Context) {
         alarmManager.cancel(pendingIntent)
     }
     context.sendBroadcast(intent)
-    Toast.makeText(context, "Alarm stopped", Toast.LENGTH_SHORT).show()
+    Toast.makeText(context, "Alarme parado", Toast.LENGTH_SHORT).show()
 }
