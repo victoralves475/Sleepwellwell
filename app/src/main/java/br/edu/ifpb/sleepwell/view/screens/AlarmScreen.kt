@@ -162,8 +162,7 @@ fun AlarmScreen(context: Context) {
 
             // Linha com botões para "Cancelar" e "Parar" o alarme
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Button(
                     onClick = { cancelAlarm(context) },
@@ -177,7 +176,6 @@ fun AlarmScreen(context: Context) {
                 ) {
                     Text("Cancelar", color = MaterialTheme.colorScheme.onSecondary, fontSize = 16.sp)
                 }
-                Spacer(modifier = Modifier.width(16.dp))
 //                Button(
 //                    onClick = { stopAlarm(context) },
 //                    modifier = Modifier
@@ -191,7 +189,6 @@ fun AlarmScreen(context: Context) {
 //                    Text("Parar", color = MaterialTheme.colorScheme.onSecondary, fontSize = 16.sp)
 //                }
             }
-            Spacer(modifier = Modifier.height(16.dp))
 
             // Exibe o tempo do alarme configurado, se disponível
             if (selectedTime.isNotEmpty()) {
