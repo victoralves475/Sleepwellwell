@@ -104,8 +104,8 @@ fun agendarNotificacaoDiaria(context: Context) {
 fun calcularDelayPara22h(): Long {
     val agora = System.currentTimeMillis()
     val calendario = java.util.Calendar.getInstance().apply {
-        set(java.util.Calendar.HOUR_OF_DAY, 21)
-        set(java.util.Calendar.MINUTE, 24)
+        set(java.util.Calendar.HOUR_OF_DAY, 22)
+        set(java.util.Calendar.MINUTE, 0)
         set(java.util.Calendar.SECOND, 0)
 
         if (timeInMillis <= agora) {
