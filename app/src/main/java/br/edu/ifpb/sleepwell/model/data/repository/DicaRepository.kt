@@ -1,8 +1,12 @@
 package br.edu.ifpb.sleepwell.model.data.repository
 
 import br.edu.ifpb.sleepwell.model.entity.Dica
+import br.edu.ifpb.sleepwell.network.RetrofitClient
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObjects
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 /**
  * DicaRepository é responsável por acessar e recuperar as dicas gerais do Firestore.
@@ -12,8 +16,6 @@ import com.google.firebase.firestore.toObjects
  */
 class DicaRepository {
 
-    // Instância do Firestore para acessar o banco de dados.
-    private val db = FirebaseFirestore.getInstance()
 
     /**
      * Lista todas as dicas gerais armazenadas na coleção "dicasGerais".
@@ -22,17 +24,13 @@ class DicaRepository {
      *                 Se a consulta for bem-sucedida, a lista conterá as dicas recuperadas;
      *                 caso contrário, será uma lista vazia.
      */
-    fun ListarDicas(callback: (List<Dica>) -> Unit) {
-        db.collection("dicasGerais").get()
-            .addOnSuccessListener { document ->
-                // Converte os documentos obtidos em uma lista de objetos Dica.
-                val dicas = document.toObjects<Dica>()
-                // Retorna a lista de dicas através do callback.
-                callback(dicas)
+    suspend fun ListarDicas(callback: (List<Dica>) -> Unit) {
+        suspend fun listarDicas(): List<Dica> {
+            return try {
+                RetrofitClient.instance.listarDicas()
+            } catch (e: Exception) {
+                emptyList() // Retorna uma lista vazia em caso de erro
             }
-            .addOnFailureListener {
-                // Em caso de falha na consulta, retorna uma lista vazia.
-                callback(emptyList())
-            }
+        }
     }
 }
