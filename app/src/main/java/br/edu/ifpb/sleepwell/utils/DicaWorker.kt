@@ -5,32 +5,32 @@ import android.content.Context
 import androidx.core.app.NotificationCompat
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import br.edu.ifpb.sleepwell.model.data.repository.DicaRepository
 import br.edu.ifpb.sleepwell.model.entity.Dica
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.runBlocking
 import kotlin.random.Random
 
 class DicaWorker(context: Context, workerParams: WorkerParameters) :
     Worker(context, workerParams) {
 
     override fun doWork(): Result {
-        val db = FirebaseFirestore.getInstance()
-        val collectionRef = db.collection("dicasGerais")
-
-        collectionRef.get()
-            .addOnSuccessListener { documents ->
-                if (!documents.isEmpty) {
-                    val dicas = documents.documents.mapNotNull { it.toObject(Dica::class.java) }
-                    if (dicas.isNotEmpty()) {
-                        val dicaAleatoria = dicas[Random.nextInt(dicas.size)]
-                        enviarNotificacao(dicaAleatoria)
-                    }
-                }
-            }
-            .addOnFailureListener {
-                // Log de erro (opcional)
+        return try {
+            // Usando o DicaRepository para buscar as dicas
+            val dicas = runBlocking {
+                DicaRepository().ListarDicas()
             }
 
-        return Result.success()
+            if (dicas.isNotEmpty()) {
+                val dicaAleatoria = dicas[Random.nextInt(dicas.size)]
+                enviarNotificacao(dicaAleatoria)
+            }
+
+            Result.success()
+        } catch (e: Exception) {
+            println("❌ Erro ao buscar dicas no DicaWorker: ${e.message}")
+            Result.failure()
+        }
     }
 
     private fun enviarNotificacao(dica: Dica) {

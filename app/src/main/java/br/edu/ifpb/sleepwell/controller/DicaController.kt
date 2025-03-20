@@ -17,10 +17,8 @@ class DicaController(private val repository: DicaRepository = DicaRepository()) 
      * @param callback Função de callback que recebe uma lista de objetos Dica
      *                 quando a operação é concluída com sucesso.
      */
-    fun listarDicas(callback: (List<Dica>) -> Unit) {
+    suspend fun listarDicas():List<Dica>{
         // Chama o método ListarDicas do DicaRepository e repassa a lista de dicas para o callback
-        repository.ListarDicas { dicas ->
-            callback(dicas)
-        }
+       return repository.ListarDicas ()
     }
 }

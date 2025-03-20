@@ -42,10 +42,8 @@ fun TipsScreen(modifier: Modifier = Modifier) {
 
     // Ao iniciar a tela, executa o bloco dentro de LaunchedEffect para buscar as dicas.
     LaunchedEffect(Unit) {
-        controller.listarDicas { dicasRecebidas ->
-            // Atualiza o estado 'dicas' com as dicas recebidas do Firestore.
-            dicas = dicasRecebidas
-        }
+        val dicasRecebidas = controller.listarDicas() // Verificar no log
+        dicas = dicasRecebidas
     }
 
     // Layout principal da tela, organizado em uma Column com padding e alinhamento à esquerda.

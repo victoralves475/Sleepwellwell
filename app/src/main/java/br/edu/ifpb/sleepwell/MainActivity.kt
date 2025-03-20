@@ -1,5 +1,8 @@
 package br.edu.ifpb.sleepwell
 
+import android.app.Application
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
@@ -21,10 +24,16 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import br.edu.ifpb.sleepwell.model.SessionManager
 import br.edu.ifpb.sleepwell.ui.theme.SleepwellTheme
-import br.edu.ifpb.sleepwell.view.screens.AlarmScreen
+import br.edu.ifpb.sleepwell.utils.DicaWorker
 import br.edu.ifpb.sleepwell.view.screens.AddDreamScreen
+import br.edu.ifpb.sleepwell.view.screens.AlarmScreen
 import br.edu.ifpb.sleepwell.view.screens.BottomAppBar
 import br.edu.ifpb.sleepwell.view.screens.CheckSleepHistoryScreen
 import br.edu.ifpb.sleepwell.view.screens.DreamDiaryScreen
@@ -46,7 +55,6 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import br.edu.ifpb.sleepwell.utils.DicaWorker
 import java.util.concurrent.TimeUnit
-import java.util.Calendar
 
 // Transição de fundo preto para efeito visual
 @Composable
@@ -89,10 +97,12 @@ fun agendarNotificacaoDiaria(context: Context) {
  */
 fun calcularDelayPara22h(): Long {
     val agora = System.currentTimeMillis()
+
     val calendario = Calendar.getInstance().apply {
         set(Calendar.HOUR_OF_DAY, 22)
         set(Calendar.MINUTE, 0)
         set(Calendar.SECOND, 0)
+
         if (timeInMillis <= agora) {
             add(Calendar.DAY_OF_MONTH, 1)
         }
