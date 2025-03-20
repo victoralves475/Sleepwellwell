@@ -26,26 +26,33 @@ import br.edu.ifpb.sleepwell.ui.theme.SleepwellTheme
 import br.edu.ifpb.sleepwell.view.screens.AlarmScreen
 import br.edu.ifpb.sleepwell.view.screens.AddDreamScreen
 import br.edu.ifpb.sleepwell.view.screens.BottomAppBar
+import br.edu.ifpb.sleepwell.view.screens.CheckSleepHistoryScreen
 import br.edu.ifpb.sleepwell.view.screens.DreamDiaryScreen
 import br.edu.ifpb.sleepwell.view.screens.HomeScreen
 import br.edu.ifpb.sleepwell.view.screens.LoginScreen
 import br.edu.ifpb.sleepwell.view.screens.SignUpScreen
+import br.edu.ifpb.sleepwell.view.screens.SleepHistoryScreen
+import br.edu.ifpb.sleepwell.view.screens.SleepQualityScreen
 import br.edu.ifpb.sleepwell.view.screens.SplashScreen
 import br.edu.ifpb.sleepwell.view.screens.TipsScreen
 import kotlinx.coroutines.delay
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import androidx.work.*
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import br.edu.ifpb.sleepwell.utils.DicaWorker
 import java.util.concurrent.TimeUnit
 import java.util.Calendar
 
+// Transição de fundo preto para efeito visual
 @Composable
 fun BlackTransitionScreen(
     onTransitionFinished: () -> Unit
 ) {
-    // Mostra um fundo preto por 500 ms
     LaunchedEffect(Unit) {
         delay(500)
         onTransitionFinished()
@@ -57,6 +64,43 @@ fun BlackTransitionScreen(
     )
 }
 
+// Função para agendar notificações diárias (já resolvida)
+fun agendarNotificacaoDiaria(context: Context) {
+    val constraints = Constraints.Builder()
+        .setRequiredNetworkType(NetworkType.CONNECTED)
+        .build()
+
+    val workRequest = PeriodicWorkRequestBuilder<DicaWorker>(
+        24, TimeUnit.HOURS
+    )
+        .setConstraints(constraints)
+        .setInitialDelay(calcularDelayPara22h(), TimeUnit.MILLISECONDS)
+        .build()
+
+    WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+        "notificacao_diaria",
+        ExistingPeriodicWorkPolicy.UPDATE,
+        workRequest
+    )
+}
+
+/**
+ * Calcula o delay até as 22h do próximo dia (ou hoje, se ainda não passou)
+ */
+fun calcularDelayPara22h(): Long {
+    val agora = System.currentTimeMillis()
+    val calendario = Calendar.getInstance().apply {
+        set(Calendar.HOUR_OF_DAY, 22)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+        if (timeInMillis <= agora) {
+            add(Calendar.DAY_OF_MONTH, 1)
+        }
+    }
+    return calendario.timeInMillis - agora
+}
+
+// Classe Application para criar o canal de notificações
 class SleepWellApp : Application() {
     override fun onCreate() {
         super.onCreate()
@@ -72,70 +116,29 @@ class SleepWellApp : Application() {
             ).apply {
                 description = "Notificações com dicas para melhorar seu sono."
             }
-
             val notificationManager = getSystemService(NotificationManager::class.java)
             notificationManager?.createNotificationChannel(channel)
         }
     }
 }
 
-fun agendarNotificacaoDiaria(context: Context) {
-    val constraints = Constraints.Builder()
-        .setRequiredNetworkType(NetworkType.CONNECTED) // Garante que haja internet para acessar o Firestore
-        .build()
-
-    val workRequest = PeriodicWorkRequestBuilder<DicaWorker>(
-        24, TimeUnit.HOURS // Repete a cada 24 horas
-    )
-        .setConstraints(constraints)
-        .setInitialDelay(calcularDelayPara22h(), TimeUnit.MILLISECONDS) // Inicia às 22h
-        .build()
-
-    WorkManager.getInstance(context).enqueueUniquePeriodicWork(
-        "notificacao_diaria",
-        ExistingPeriodicWorkPolicy.UPDATE,
-        workRequest
-    )
-}
-
-/**
- * Calcula o tempo até a próxima execução às 22h.
- */
-fun calcularDelayPara22h(): Long {
-    val agora = System.currentTimeMillis()
-    val calendario = java.util.Calendar.getInstance().apply {
-        set(java.util.Calendar.HOUR_OF_DAY, 22)
-        set(java.util.Calendar.MINUTE, 0)
-        set(java.util.Calendar.SECOND, 0)
-
-        if (timeInMillis <= agora) {
-            add(java.util.Calendar.DAY_OF_MONTH, 1) // Se já passou das 22h, agenda para o próximo dia
-        }
-    }
-    return calendario.timeInMillis - agora
-}
-
-
-
-
+@RequiresApi(Build.VERSION_CODES.S)
 class MainActivity : ComponentActivity() {
-    @RequiresApi(Build.VERSION_CODES.S)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             SleepwellTheme {
-                SleepWellApp(context = this)
+                SleepWellAppContent(context = this)
             }
             agendarNotificacaoDiaria(this)
         }
     }
 }
 
-
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
-fun SleepWellApp(context: Context) {
+fun SleepWellAppContent(context: Context) {
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route
@@ -143,7 +146,7 @@ fun SleepWellApp(context: Context) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = {
-            if (currentRoute !in listOf("login", "signup", "splash", "transition", "add-dream")) {
+            if (currentRoute !in listOf("login", "signup", "splash", "transition", "add-dream", "sleep-quality", "check-sleep")) {
                 BottomAppBar(
                     onProfileClick = { navController.navigate("profile") },
                     onHomeClick = { navController.navigate("home") },
@@ -187,18 +190,35 @@ fun SleepWellApp(context: Context) {
             // Tela de Transição (fundo preto por 500ms)
             composable("transition") {
                 BlackTransitionScreen {
-                    navController.navigate("home") {
+                    // Após a transição, verificar o registro de sono do dia anterior
+                    navController.navigate("check-sleep") {
                         popUpTo("transition") { inclusive = true }
                     }
                 }
             }
-            // Tela Principal (Home)
+            // Tela para checar o histórico do sono do dia anterior
+            composable("check-sleep") {
+                CheckSleepHistoryScreen(
+                    userId = SessionManager.currentUser?.id ?: "user123",
+                    onNavigateToSleepQuality = { navController.navigate("sleep-quality") },
+                    onNavigateToHome = { navController.navigate("home") }
+                )
+            }
+            // Tela para registrar a qualidade do sono (se não houver registro)
+            composable("sleep-quality") {
+                SleepQualityScreen(
+                    userId = SessionManager.currentUser?.id ?: "user123",
+                    onSleepRecorded = { navController.navigate("home") }
+                )
+            }
+            // Tela Principal (Home) com botão para acessar o histórico do sono
             composable("home") {
                 HomeScreen(
                     userName = SessionManager.currentUser?.nome ?: "Usuário",
                     onAlarmClick = { navController.navigate("alarm") },
                     onNavigateToDiary = { navController.navigate("dream-diary") },
-                    onTipsClick = { navController.navigate("tips") }
+                    onTipsClick = { navController.navigate("tips") },
+                    onNavigateToSleepHistory = { navController.navigate("sleep-history") }
                 )
             }
             // Tela de Alarme
@@ -229,6 +249,10 @@ fun SleepWellApp(context: Context) {
                         }
                     }
                 )
+            }
+            // Tela de Histórico do Sono – exibe barra de porcentagem e lista de registros
+            composable("sleep-history") {
+                SleepHistoryScreen(userId = SessionManager.currentUser?.id ?: "user123")
             }
         }
     }
