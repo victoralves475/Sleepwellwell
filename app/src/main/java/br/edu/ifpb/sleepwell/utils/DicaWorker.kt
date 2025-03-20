@@ -7,6 +7,7 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import br.edu.ifpb.sleepwell.model.data.repository.DicaRepository
 import br.edu.ifpb.sleepwell.model.entity.Dica
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.runBlocking
 import kotlin.random.Random
 
