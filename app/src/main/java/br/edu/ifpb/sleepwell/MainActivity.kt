@@ -80,28 +80,41 @@ class SleepWellApp : Application() {
 }
 
 fun agendarNotificacaoDiaria(context: Context) {
-    val agora = Calendar.getInstance()
-    val proximaExecucao = Calendar.getInstance().apply {
-        set(Calendar.HOUR_OF_DAY, 22)
-        set(Calendar.MINUTE, 0)
-        set(Calendar.SECOND, 0)
-
-        if (timeInMillis <= agora.timeInMillis) {
-            add(Calendar.DAY_OF_MONTH, 1)  // Agendar para o próximo dia se já passou das 22h
-        }
-    }
-
-    val tempoAteExecucao = proximaExecucao.timeInMillis - agora.timeInMillis
-    val workRequest = OneTimeWorkRequestBuilder<DicaWorker>()
-        .setInitialDelay(tempoAteExecucao, TimeUnit.MILLISECONDS)
+    val constraints = Constraints.Builder()
+        .setRequiredNetworkType(NetworkType.CONNECTED) // Garante que haja internet para acessar o Firestore
         .build()
 
-    WorkManager.getInstance(context).enqueueUniqueWork(
+    val workRequest = PeriodicWorkRequestBuilder<DicaWorker>(
+        24, TimeUnit.HOURS // Repete a cada 24 horas
+    )
+        .setConstraints(constraints)
+        .setInitialDelay(calcularDelayPara22h(), TimeUnit.MILLISECONDS) // Inicia às 22h
+        .build()
+
+    WorkManager.getInstance(context).enqueueUniquePeriodicWork(
         "notificacao_diaria",
-        ExistingWorkPolicy.REPLACE,
+        ExistingPeriodicWorkPolicy.UPDATE,
         workRequest
     )
 }
+
+/**
+ * Calcula o tempo até a próxima execução às 22h.
+ */
+fun calcularDelayPara22h(): Long {
+    val agora = System.currentTimeMillis()
+    val calendario = java.util.Calendar.getInstance().apply {
+        set(java.util.Calendar.HOUR_OF_DAY, 22)
+        set(java.util.Calendar.MINUTE, 0)
+        set(java.util.Calendar.SECOND, 0)
+
+        if (timeInMillis <= agora) {
+            add(java.util.Calendar.DAY_OF_MONTH, 1) // Se já passou das 22h, agenda para o próximo dia
+        }
+    }
+    return calendario.timeInMillis - agora
+}
+
 
 
 
