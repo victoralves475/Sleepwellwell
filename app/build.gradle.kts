@@ -54,8 +54,10 @@ dependencies {
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.common.ktx)
     implementation(libs.firebase.firestore.ktx)
-    implementation("androidx.work:work-runtime-ktx:2.8.1")
-    implementation("com.google.firebase:firebase-firestore-ktx:24.6.1")
+    implementation (libs.retrofit)
+    implementation (libs.converter.gson)
+    implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.firebase.firestore.ktx.v2461)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
