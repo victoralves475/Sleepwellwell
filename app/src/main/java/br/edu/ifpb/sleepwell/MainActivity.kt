@@ -1,8 +1,5 @@
 package br.edu.ifpb.sleepwell
 
-import android.app.Application
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
@@ -24,14 +21,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.work.Constraints
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
 import br.edu.ifpb.sleepwell.model.SessionManager
 import br.edu.ifpb.sleepwell.ui.theme.SleepwellTheme
-import br.edu.ifpb.sleepwell.utils.DicaWorker
 import br.edu.ifpb.sleepwell.view.screens.AddDreamScreen
 import br.edu.ifpb.sleepwell.view.screens.AlarmScreen
 import br.edu.ifpb.sleepwell.view.screens.BottomAppBar
@@ -54,6 +46,7 @@ import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import br.edu.ifpb.sleepwell.utils.DicaWorker
+import java.util.Calendar
 import java.util.concurrent.TimeUnit
 
 // Transição de fundo preto para efeito visual
