@@ -1,0 +1,40 @@
+{
+  "dicas": [
+    {
+      "id": 1,
+      "titulo": "Evite cafeína antes de dormir",
+      "descricao": "A cafeína é um estimulante que pode interferir no sono, dificultando o relaxamento do corpo e da mente. Bebidas como café, chá preto, refrigerantes e energéticos podem permanecer no organismo por até 6 horas, prejudicando a qualidade do sono. Para um descanso melhor, evite consumir cafeína pelo menos 4 a 6 horas antes de dormir."
+    },
+    {
+      "id": 2,
+      "titulo": "Crie uma rotina de sono regular",
+      "descricao":
+      "O corpo humano possui um relógio biológico interno, chamado ritmo circadiano, que regula o ciclo de sono e vigília. Manter um horário fixo para dormir e acordar ajuda a equilibrar esse relógio, tornando o sono mais profundo e restaurador. Mesmo nos finais de semana, tente manter a mesma rotina para evitar desajustes no ciclo do sono."
+    },
+    {
+      "id": 3,
+      "titulo": "Evite refeições pesadas antes de deitar",
+      "descricao": "Comer refeições pesadas antes de dormir pode dificultar a digestão, causando desconforto e afetando o sono. Prefira refeições leves à noite e evite alimentos gordurosos, condimentados ou com alto teor de açúcar. Se sentir fome antes de dormir, opte por lanches leves como frutas, iogurte natural ou chás calmantes."
+    },
+    {
+      "id": 4,
+      "titulo":"Mantenha seu quarto escuro e silencioso",
+      "descricao": "Um ambiente escuro e silencioso facilita a produção de melatonina e melhora a qualidade do sono. Utilize cortinas blackout para bloquear a luz externa e, se necessário, protetores auriculares ou máquinas de ruído branco para reduzir sons indesejados. Pequenos ajustes no ambiente podem fazer uma grande diferença na qualidade do descanso."
+    },
+    {
+      "id": 6,
+      "titulo":"Mantenha uma temperatura agradável no quarto",
+      "descricao": "O corpo precisa reduzir a temperatura interna para iniciar o processo do sono. Ambientes muito quentes ou frios podem prejudicar esse processo. A temperatura ideal para dormir fica entre 18°C e 22°C. Use roupas confortáveis, escolha um colchão e travesseiro adequados e ajuste a ventilação do quarto para garantir um ambiente aconchegante."
+    },
+    {
+      "id": 7,
+      "titulo":"Pratique exercícios físicos regularmente",
+      "descricao":"A atividade física melhora a qualidade do sono, ajudando o corpo a liberar energia acumulada e reduzindo os níveis de estresse e ansiedade. No entanto, evite treinos intensos nas 3 horas antes de dormir, pois eles podem estimular o sistema nervoso e dificultar o relaxamento. Prefira atividades mais leves à noite, como alongamento ou yoga."
+    },
+    {
+      "id": 8,
+      "titulo":"Reduza a exposição à luz azul antes de dormir",
+      "descricao": "A luz azul emitida por telas de celulares, computadores e televisões inibe a produção de melatonina, o hormônio responsável pelo sono. O ideal é reduzir o uso desses dispositivos pelo menos 1 hora antes de dormir ou ativar o modo noturno, que reduz a emissão dessa luz e minimiza seus efeitos negativos."
+    }
+  ]
+}
