@@ -16,21 +16,15 @@ import retrofit2.Response
  */
 class DicaRepository {
 
-
-    /**
-     * Lista todas as dicas gerais armazenadas na coleção "dicasGerais".
-     *
-     * @param callback Função que recebe uma lista de objetos Dica.
-     *                 Se a consulta for bem-sucedida, a lista conterá as dicas recuperadas;
-     *                 caso contrário, será uma lista vazia.
-     */
-    suspend fun ListarDicas(callback: (List<Dica>) -> Unit) {
-        suspend fun listarDicas(): List<Dica> {
-            return try {
-                RetrofitClient.instance.listarDicas()
-            } catch (e: Exception) {
-                emptyList() // Retorna uma lista vazia em caso de erro
-            }
+    suspend fun ListarDicas(): List<Dica> {
+        return try {
+            println("🔄 Enviando requisição para o JSON Server...")
+            val response = RetrofitClient.instance.listarDicas()
+            println("✅ Resposta recebida: $response")
+            response
+        } catch (e: Exception) {
+            println("❌ Erro ao buscar dicas: ${e.message}")
+            emptyList() // Retorna uma lista vazia em caso de erro
         }
     }
 }

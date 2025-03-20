@@ -1,5 +1,8 @@
 package br.edu.ifpb.sleepwell
 
+import android.app.Application
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
@@ -21,10 +24,16 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import br.edu.ifpb.sleepwell.model.SessionManager
 import br.edu.ifpb.sleepwell.ui.theme.SleepwellTheme
-import br.edu.ifpb.sleepwell.view.screens.AlarmScreen
+import br.edu.ifpb.sleepwell.utils.DicaWorker
 import br.edu.ifpb.sleepwell.view.screens.AddDreamScreen
+import br.edu.ifpb.sleepwell.view.screens.AlarmScreen
 import br.edu.ifpb.sleepwell.view.screens.BottomAppBar
 import br.edu.ifpb.sleepwell.view.screens.DreamDiaryScreen
 import br.edu.ifpb.sleepwell.view.screens.HomeScreen
@@ -33,13 +42,7 @@ import br.edu.ifpb.sleepwell.view.screens.SignUpScreen
 import br.edu.ifpb.sleepwell.view.screens.SplashScreen
 import br.edu.ifpb.sleepwell.view.screens.TipsScreen
 import kotlinx.coroutines.delay
-import android.app.Application
-import android.app.NotificationChannel
-import android.app.NotificationManager
-import androidx.work.*
-import br.edu.ifpb.sleepwell.utils.DicaWorker
 import java.util.concurrent.TimeUnit
-import java.util.Calendar
 
 @Composable
 fun BlackTransitionScreen(
@@ -104,8 +107,8 @@ fun agendarNotificacaoDiaria(context: Context) {
 fun calcularDelayPara22h(): Long {
     val agora = System.currentTimeMillis()
     val calendario = java.util.Calendar.getInstance().apply {
-        set(java.util.Calendar.HOUR_OF_DAY, 22)
-        set(java.util.Calendar.MINUTE, 0)
+        set(java.util.Calendar.HOUR_OF_DAY, 16)
+        set(java.util.Calendar.MINUTE, 10)
         set(java.util.Calendar.SECOND, 0)
 
         if (timeInMillis <= agora) {
